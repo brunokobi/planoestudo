@@ -35,6 +35,13 @@ AN = dict(resumo='<div class="eyebrow">Resumo</div><h2>O edital em números</h2>
 for k in AN: AN[k] = AN[k].replace('href="#diaD"','href="#diad"').replace('href="#cronograma"','href="inicio.html"')
 d["analise"] = AN
 d["sims"] = json.load(open(G + "/sims.json"))
+sys.path.insert(0, G)
+import articles, prov_en
+d["prov"] = prov_en.build(articles.A)
+_pt = {r["url"]: r for r in d["prov"]["rank"]}
+for a in d["arts"]:
+    r = _pt[a["url"]]; a["pri"] = r["tier"]; a["score"] = r["total"]; a["pos"] = r["pos"]
+    if r["note"]: a["why"] = r["note"]
 open(OUT + "/data.js", "w").write("window.DATA=" + json.dumps(d, ensure_ascii=False).replace("</", "<\\/") + ";")
 shutil.copy(G + "/app.js", OUT + "/app.js"); shutil.copy(G + "/style.css", OUT + "/style.css")
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">'

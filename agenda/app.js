@@ -83,10 +83,11 @@ function timeline(d){
   return we ? '<div class="timeline"><div><b>0–180 min</b>Específicas: tarefas, questões e exercícios abaixo (pausa de 10 min a cada hora)</div><div><b>180–240</b>Inglês (1h): a tarefa da seção Inglês do dia</div></div>'
             : '<div class="timeline"><div><b>0–100 min</b>Específicas: tarefas, questões e exercícios abaixo</div><div><b>100–120</b>Inglês (20 min): a tarefa da seção Inglês do dia</div></div>';
 }
+var PQ = {}; (DATA.prov ? DATA.prov.quizzes : []).forEach(function(q){ PQ[q.url] = q.id; });
 function artItem(a){
   var cls = a.pri==="Máxima"?"simulado":a.pri==="Alta"?"pratica":"estudo";
-  return '<li class="ex">'+chk(a.id, '<span class="pill p-'+cls+'">'+esc(a.pri)+'</span> <a href="'+esc(a.url)+'" target="_blank" rel="noopener"><b>'+esc(a.title)+'</b></a> <span class="small muted">· MIT News, '+esc(a.dt)+'/2026</span>')+
-    '<p class="small muted" style="padding-left:30px">Por que é provável: '+esc(a.why)+'</p></li>';
+  return '<li class="ex">'+chk(a.id, '<span class="pill p-'+cls+'">'+esc(a.pri)+'</span> <a href="'+esc(a.url)+'" target="_blank" rel="noopener"><b>'+esc(a.title)+'</b></a> <span class="small muted">· MIT News, '+esc(a.dt)+'/2026'+(a.score?' · nota '+a.score+'/100, '+a.pos+'º lugar':'')+'</span>')+
+    '<p class="small muted" style="padding-left:30px">Análise: '+esc(a.why)+(PQ[a.url]?' <a href="ingles.html#'+PQ[a.url]+'">Fazer as 10 questões prováveis →</a>':'')+'</p></li>';
 }
 function dayBody(d){
   var tp = d.topic ? T[d.topic] : null, h = [];
@@ -379,7 +380,7 @@ function ingles(){
     P.artigos += '<div class="card"><div class="eyebrow"><a href="'+weekFile(+w)+'">Semana '+w+' · '+esc(WEEKS[w-1].range)+'</a></div><ul class="tasks">'+wks[w].map(artItem).join("")+'</ul></div>';
   });
   P.artigos += '<div class="card"><h3>Reta final (semanas 12 e 13)</h3><p>Releia os artigos de prioridade <b>Máxima</b>: só o seu resumo e as palavras do Anki.</p></div></section>';
-  return h + tabs("ingles", [{key:"raiox",label:"Raio-X das provas",html:P.raiox},{key:"tipos",label:"Tipos de pergunta",html:P.tipos},{key:"metodo",label:"Método",html:P.metodo},{key:"vocab",label:"Vocabulário",html:P.vocab},{key:"treino",label:"Treino com provas",html:P.treino},{key:"texto",label:"Texto de treino",html:P.texto},{key:"artigos",label:"Artigos prováveis",html:P.artigos}]);
+  return h + tabs("ingles", [{key:"raiox",label:"Raio-X das provas",html:P.raiox},{key:"tipos",label:"Tipos de pergunta",html:P.tipos},{key:"metodo",label:"Método",html:P.metodo},{key:"vocab",label:"Vocabulário",html:P.vocab},{key:"treino",label:"Treino com provas",html:P.treino},{key:"texto",label:"Texto de treino",html:P.texto},{key:"artigos",label:"Artigos prováveis",html:P.artigos},{key:"provaveis",label:"Prováveis + questões",html:provHTML()}]);
 }
 function bindQuiz(){
   var b = document.getElementById("corrigir"); if (!b) return;
@@ -393,6 +394,61 @@ function bindQuiz(){
     });
     document.getElementById("nota").textContent = "Você acertou "+ok+" de 10. A alternativa certa está em verde.";
     st["en-own-score"] = ok; if (ok >= 5) st["en-own"] = true; save();
+  });
+}
+
+
+/* ---------- Inglês: pré-análise dos artigos e questões prováveis ---------- */
+function pqBlock(z, q, i){
+  var name = "pq-"+z.id+"-"+i, sel = st["pqans:"+z.id+":"+i];
+  return '<div class="ex pq" data-z="'+z.id+'" data-ans="'+q.ans+'"><div><b>'+(i+1)+'.</b> '+esc(q.stem)+'</div><ul class="opts">'+
+    q.opts.map(function(o,j){ return '<li><label data-o="'+j+'"><input type="radio" name="'+name+'" value="'+j+'"'+(sel===j?" checked":"")+'> <span>'+"abcde"[j]+') '+esc(o)+'</span></label></li>'; }).join("")+'</ul>'+
+    '<p class="small muted why" hidden>Resposta: <b>'+"abcde"[q.ans]+')</b> · onde está no texto: '+esc(q.par)+' · '+esc(q.why)+'</p></div>';
+}
+function pqPanel(z){
+  var r = st["pqres:"+z.id];
+  return '<div class="panelhead"><div class="eyebrow">Nota '+z.total+'/100 · MIT News, '+esc(z.dt)+'/2026</div><h3><a href="'+esc(z.url)+'" target="_blank" rel="noopener">'+esc(z.title)+' ↗</a></h3>'+
+    '<p class="muted">Leia o artigo no MIT News em até 15 min (abre em outra aba) e responda sem voltar ao texto. Depois corrija e releia só os parágrafos das questões que errou. Os § contam os intertítulos como parágrafos.</p>'+
+    (r?'<div class="card"><b>Última correção ('+esc(r.date)+'):</b> '+r.ok+'/10</div>':'')+'</div>'+
+    '<div class="card">'+z.qs.map(function(q,i){ return pqBlock(z, q, i); }).join("")+'</div>'+
+    '<div class="nav"><button class="btn primary" type="button" data-pqgrade="'+z.id+'">Corrigir</button><button class="btn" type="button" data-pqreset="'+z.id+'">Limpar</button><span class="meta" id="pqres-'+z.id+'"></span></div>';
+}
+function pqPos(z){ return DATA.prov.rank.filter(function(r){return r.url===z.url;})[0].pos; }
+function provHTML(){
+  var P = DATA.prov; if (!P) return "";
+  var top = P.rank.slice(0, 6);
+  var rub = '<div class="card"><h3>Como a nota foi calculada (100 pontos)</h3><ul>'+P.rubric.map(function(r){ return '<li><b>'+esc(r[1])+' (até '+r[2]+')</b>: '+esc(r[3])+'</li>'; }).join("")+'</ul>'+
+    '<p class="small muted">Máxima: 80 ou mais. Alta: 70 a 79. Média: abaixo de 70. A nota é uma estimativa; o texto da prova pode ser um artigo publicado depois de outubro. Por isso a varredura semanal continua valendo, e você pode dar nota aos artigos novos com a mesma régua.</p></div>';
+  var rows = P.rank.map(function(r){ var cls = r.tier==="Máxima"?"simulado":r.tier==="Alta"?"pratica":"estudo";
+    return '<tr><td><b>'+r.pos+'º</b></td><td><a href="'+esc(r.url)+'" target="_blank" rel="noopener">'+esc(r.title)+'</a><div class="small muted">'+esc(r.note)+'</div></td><td>'+esc(r.dt)+'</td>'+
+      r.s.map(function(v){return '<td>'+v+'</td>';}).join("")+'<td><b>'+r.total+'</b></td><td><span class="pill p-'+cls+'">'+r.tier+'</span></td></tr>'; }).join("");
+  var tbl = '<div class="tablebox"><table><thead><tr><th>#</th><th>Artigo</th><th>Data</th><th>Formato<br>/30</th><th>Tema<br>/30</th><th>Janela<br>/15</th><th>Tam.<br>/15</th><th>Acess.<br>/10</th><th>Total</th><th>Prioridade</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  var lead = '<section><div class="eyebrow">Pré-análise dos 33 artigos</div><h2>Os mais prováveis e as questões de cada um</h2>'+
+    '<p class="muted">Cada artigo recebeu nota de 0 a 100 numa régua tirada das provas de 2022 a 2025-2R. Para os 6 primeiros, há 10 questões no formato da banca: em inglês, 5 alternativas, na ordem do texto, terminando com implicação ou lição geral. Cada simulado tem 2 respostas de cada letra, como nas provas de 2025.</p>'+
+    '<div class="facts">'+top.slice(0,4).map(function(r){ return '<div class="fact"><b>'+r.total+'</b><span>'+r.pos+'º · '+esc(r.title)+'</span></div>'; }).join("")+'</div></section>';
+  return lead + tabs("prov", [{key:"ranking", label:"Ranking dos 33", html:rub+tbl}].concat(P.quizzes.slice().sort(function(a,b){ return pqPos(a)-pqPos(b); }).map(function(z,k){
+    var r = st["pqres:"+z.id]; return {key:z.id, cls:r?"done":"", label:pqPos(z)+'º · '+esc(z.title.replace(/^Q&A:\s*/,'').split(/[:—]/)[0].slice(0,34))+'<small>'+(r?r.ok+'/10':z.total+' pts')+'</small>', html:pqPanel(z)}; })), "ranking");
+}
+function bindProv(){
+  if (PAGE !== "ingles" || !DATA.prov) return;
+  app.addEventListener("change", function(e){ var n = e.target.name; if (!n || n.indexOf("pq-") !== 0) return;
+    var p = n.split("-"); st["pqans:"+p[1]+":"+p[2]] = +e.target.value; save(); });
+  app.addEventListener("click", function(e){
+    var g = e.target.getAttribute && e.target.getAttribute("data-pqgrade"), rs = e.target.getAttribute && e.target.getAttribute("data-pqreset");
+    if (!g && !rs) return;
+    var id = g || rs, ok = 0, blank = 0;
+    document.querySelectorAll('.pq[data-z="'+id+'"]').forEach(function(el){
+      var ans = +el.getAttribute("data-ans"), sel = el.querySelector("input:checked");
+      el.querySelectorAll("label").forEach(function(l){ l.classList.remove("right","wrong"); });
+      if (rs) { el.querySelectorAll("input").forEach(function(i){ i.checked = false; }); el.querySelector(".why").hidden = true; return; }
+      el.querySelector('label[data-o="'+ans+'"]').classList.add("right"); el.querySelector(".why").hidden = false;
+      if (!sel) blank++; else if (+sel.value === ans) ok++; else sel.parentNode.classList.add("wrong");
+    });
+    var out = document.getElementById("pqres-"+id);
+    if (rs) { Object.keys(st).forEach(function(k){ if (k.indexOf("pqans:"+id+":")===0) delete st[k]; }); save(); out.textContent = ""; return; }
+    var now = new Date(); st["pqres:"+id] = {ok:ok, date:pad(now.getDate())+"/"+pad(now.getMonth()+1)}; save();
+    var tb = document.getElementById("tb-"+id); if (tb) tb.classList.add("done");
+    out.textContent = "Você acertou "+ok+" de 10"+(blank?" ("+blank+" em branco)":"")+". "+(ok>=8?"Meta atingida.":ok>=5?"Passaria, mas a meta é 8.":"Na prova, 4 ou menos elimina.")+" Veja o parágrafo de cada erro.";
   });
 }
 
@@ -484,6 +540,7 @@ nav();
 var R = {home:home, mapa:mapa, semana:semana, temas:temas, tecnicas:tecnicas, ingles:ingles, analise:analise, simulados:simulados};
 app.innerHTML = (R[PAGE] || home)();
 bindQuiz();
+bindProv();
 bindSim();
 app.addEventListener("change", function(e){
   var k = e.target.getAttribute && e.target.getAttribute("data-k"); if (!k) return;
