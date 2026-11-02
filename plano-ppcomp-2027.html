@@ -1,0 +1,438 @@
+<title>Plano PPComp 2027</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: folha de cartão-resposta — coluna única de leitura, tabelas largas roláveis, "bolhas" de caneta como marcador de estado */
+:root{
+  --paper:#f5f7fb; --sheet:#ffffff; --ink:#18213a; --muted:#5a6580; --line:#d9dfeb;
+  --pen:#22379a; --pen-soft:#e3e8fa; --hot:#b5361f; --hot-soft:#fbe7e2; --ok:#1e7a4f; --ok-soft:#e1f3ea; --warn:#9a6a00; --warn-soft:#fbf0d6;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f1422; --sheet:#161d30; --ink:#e6eaf5; --muted:#9aa5c2; --line:#2a3450;
+  --pen:#9db0ff; --pen-soft:#22305c; --hot:#ff8a73; --hot-soft:#3d1f1a; --ok:#6fd3a2; --ok-soft:#163327; --warn:#f0c160; --warn-soft:#3a2e12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --sheet:#161d30; --ink:#e6eaf5; --muted:#9aa5c2; --line:#2a3450;
+  --pen:#9db0ff; --pen-soft:#22305c; --hot:#ff8a73; --hot-soft:#3d1f1a; --ok:#6fd3a2; --ok-soft:#163327; --warn:#f0c160; --warn-soft:#3a2e12; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body)}
+.wrap{max-width:980px;margin:0 auto;padding-block:32px 80px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:grid;gap:40px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:26px;font-weight:700}
+h3{font-size:18px;font-weight:600}
+p{margin:0;max-width:72ch}
+section{display:grid;gap:16px;min-width:0}
+.eyebrow{font:500 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pen)}
+.muted{color:var(--muted)}
+code,.mono{font-family:var(--f-mono);font-size:.92em}
+code{background:var(--pen-soft);padding:1px 5px;border-radius:4px}
+.hero{display:grid;gap:18px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.fact{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:4px;align-content:start}
+.fact b{font:700 28px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.fact span{font-size:13px;color:var(--muted)}
+.fact.alert{border-color:var(--hot);background:var(--hot-soft)}
+.fact.alert b{color:var(--hot)}
+.callout{border-left:3px solid var(--pen);background:var(--sheet);padding:14px 18px;border-radius:0 8px 8px 0;display:grid;gap:8px}
+.callout.hot{border-color:var(--hot)}
+ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px/1.3 var(--f-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--paper)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:8px;border-radius:4px;background:var(--pen);min-width:2px}
+.barcell{width:28%;min-width:120px}
+.bubbles{display:inline-flex;gap:3px;vertical-align:middle}
+.bubbles i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--pen);display:inline-block}
+.bubbles i.on{background:var(--pen)}
+.tier{font:600 11px/1 var(--f-mono);padding:4px 7px;border-radius:999px;white-space:nowrap;display:inline-block}
+.t-s{background:var(--hot-soft);color:var(--hot)}
+.t-a{background:var(--warn-soft);color:var(--warn)}
+.t-b{background:var(--pen-soft);color:var(--pen)}
+.t-c{background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.blueprint{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.bq{aspect-ratio:1;max-width:100%;border-radius:50%;display:grid;place-items:center;font:500 11px var(--f-mono);border:1.5px solid currentColor}
+.bq.prog{color:var(--pen);background:var(--pen-soft)}
+.bq.ed{color:var(--ok);background:var(--ok-soft)}
+.bq.busca{color:var(--warn);background:var(--warn-soft)}
+.bq.ord{color:var(--hot);background:var(--hot-soft)}
+.bq.log{color:var(--ink);background:var(--sheet)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:50%;border:1.5px solid currentColor;display:inline-block}
+.weeks{display:grid;gap:12px}
+.week{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:10px}
+.week header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.week header .mono{color:var(--muted);font-size:13px}
+.week.milestone{border-color:var(--hot)}
+.tasks{list-style:none;padding:0;display:grid;gap:6px}
+.tasks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.tasks input{appearance:none;width:18px;height:18px;border:1.5px solid var(--pen);border-radius:50%;flex:none;margin-top:2px;cursor:pointer;background:var(--sheet)}
+.tasks input:checked{background:var(--pen);box-shadow:inset 0 0 0 3px var(--sheet)}
+.tasks input:focus-visible{outline:2px solid var(--pen);outline-offset:2px}
+.tasks input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.cp{font-size:14px;background:var(--ok-soft);color:var(--ok);padding:8px 12px;border-radius:8px}
+.cp b{font-weight:600}
+.edital{font-size:13px;color:var(--hot);font-weight:500}
+.progress{display:flex;align-items:center;gap:12px;font:500 13px var(--f-mono)}
+.progress .track{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.progress .fill{height:100%;background:var(--ok);width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:10px;align-content:start;min-width:0}
+.trap{font-size:14px}
+.trap li{padding-left:2px}
+pre{margin:0;font:13px/1.5 var(--f-mono);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto}
+.toc{display:flex;flex-wrap:wrap;gap:8px}
+.toc a{font:500 13px var(--f-mono);color:var(--pen);text-decoration:none;border:1px solid var(--line);padding:5px 10px;border-radius:999px;background:var(--sheet)}
+.toc a:hover,.toc a:focus-visible{border-color:var(--pen)}
+a{color:var(--pen)}
+@media (max-width:520px){.blueprint{grid-template-columns:repeat(6,1fr)}}
+@media (prefers-reduced-motion:no-preference){.progress .fill{transition:width .3s}}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Edital 25/2026 · Ifes Serra · Mestrado Profissional em Computação Aplicada</div>
+  <h1>Plano de estudo PPComp 2027</h1>
+  <p class="muted">Feito a partir do edital, das 5 provas anteriores que estão na pasta (2022, 2024-2, 2025-1, 2025-2 e 2025-2 remanescentes, com gabaritos) e da análise do Gemini. Cada questão das provas foi classificada por tema e o peso de cada tema virou a carga horária do plano.</p>
+  <div class="facts">
+    <div class="fact alert"><b id="countdown">94 dias</b><span>até a prova, quinta 04/02/2027, à noite, no Campus Serra</span></div>
+    <div class="fact alert"><b>30 questões</b><span>de Específicas. Nas 3 provas de 2025 eram 20. Isso muda o plano.</span></div>
+    <div class="fact"><b>≥ 15/30</b><span>em Específicas para não ser eliminado (N2)</span></div>
+    <div class="fact"><b>≥ 5/10</b><span>em Inglês: nota 4 ou menos elimina (N1)</span></div>
+    <div class="fact"><b>N1 + 2·N2 + N3</b><span>Nota final, máx. 110. Cada acerto em Específicas vale 2 pontos.</span></div>
+    <div class="fact"><b>40 pts</b><span>Currículo (N3), entregue em 05/02, um dia depois da prova</span></div>
+  </div>
+  <p><a href="https://claude.ai/artifact/5Yae2MictWDHGVAE9ABLSj" target="_blank" rel="noopener"><b>Abrir a agenda dia a dia →</b></a></p>
+  <nav class="toc" aria-label="Seções">
+    <a href="#gemini">Gemini x provas</a><a href="#metodo">Método de previsão</a><a href="#ranking">Ranking de temas</a><a href="#prova2027">Prova provável</a><a href="#cronograma">Cronograma</a><a href="#tecnicas">Técnicas</a><a href="#armadilhas">Pegadinhas</a><a href="#ingles">Inglês</a><a href="#curriculo">Currículo</a><a href="#diaD">Dia da prova</a>
+  </nav>
+</header>
+
+<section id="gemini">
+  <div class="eyebrow">Diagnóstico</div>
+  <h2>O que a análise do Gemini acertou e o que faltou</h2>
+  <p>O Gemini resumiu bem o edital (vagas, datas, fórmula, conteúdo), mas montou o plano sem olhar as provas. O plano dele é genérico e tem quatro lacunas:</p>
+  <div class="grid2">
+    <div class="card"><h3>1. Grafos ficaram de fora</h3><p>BFS e DFS caíram nas <b>3 provas de 2025</b> (5 questões ao todo, incluindo matriz de adjacência e O(V+E)). O edital diz "Algoritmos de Busca", e a banca entende isso como busca binária <i>e</i> busca em grafos. O Gemini só fala de busca sequencial e binária.</p></div>
+    <div class="card"><h3>2. Heap e hash também ficaram de fora</h3><p>Fila de prioridade com <code>heapq</code>, heap e tabela hash O(1) aparecem em 2 das 3 provas de 2025. O Gemini cita pilha, fila, lista e árvore, mas não esses dois.</p></div>
+    <div class="card"><h3>3. Carga horária mal distribuída</h3><p>Ele dá 3 semanas iniciais para lógica de predicados. Nas provas, predicados aparecem só como negação de "todo/algum". O que mais cai é <b>teste de mesa em Python</b> (25% da prova), e o plano do Gemini dá a isso só 2 semanas. Já o checkpoint "pilha com duas filas" nunca caiu.</p></div>
+    <div class="card"><h3>4. Não usa o calendário real</h3><p>Ele ignora que a prova passou de 20 para 30 questões, os feriados de fim de ano, o prazo da taxa (13/12) e o fato de o currículo ser entregue no dia seguinte à prova. Também não tem nenhum simulado com prova real antes da semana 10.</p></div>
+  </div>
+</section>
+
+<section id="metodo">
+  <div class="eyebrow">Técnica de previsão</div>
+  <h2>Matriz de Recorrência Ponderada (MRP)</h2>
+  <p>A ideia é tratar cada prova antiga como uma amostra do "gosto" da banca e projetar essa distribuição para uma prova de 30 questões. São quatro passos:</p>
+  <ul>
+    <li><b>Filtrar pelo edital atual.</b> Só valem as provas com o mesmo conteúdo programático: 2025-1, 2025-2 e 2025-2R (60 questões). As de 2022 e 2024-2 tinham OO, C, redes, UML e BPMN, temas que saíram do edital. Delas só aproveitei as questões que ainda servem, como material de treino.</li>
+    <li><b>Classificar cada questão</b> em 22 subtemas (ex.: <code>teste de mesa</code>, <code>BFS/DFS</code>, <code>negação</code>).</li>
+    <li><b>Ponderar por recência.</b> As provas 2025-1 e 2025-2 têm peso 1,0 e a 2025-2R, a mais recente, tem 1,2. Com isso sai a participação de cada tema e o <b>número esperado de questões em 30</b>.</li>
+    <li><b>Estimar a chance de cair pelo menos 1 questão</b> com <span class="mono">P = 1 − (1 − participação)<sup>30</sup></span> e cruzar com a presença em cada prova (3/3, 2/3, 1/3). Daí saem as faixas de prioridade: <span class="tier t-s">S</span> cai quase certo · <span class="tier t-a">A</span> muito provável · <span class="tier t-b">B</span> provável · <span class="tier t-c">C</span> pode cair.</li>
+  </ul>
+  <div class="callout">
+    <b>Padrões fixos que a banca repete</b>
+    <ul>
+      <li><b>A ordem dos blocos não muda:</b> Python → Estruturas de Dados → Busca/Ordenação → Lógica, sempre com Lógica nas últimas 4–5 questões.</li>
+      <li><b>Formatos de questão:</b> cerca de 45% são "qual a saída do código", 20% são "complete a linha" ou "qual código está correto", 20% são conceituais (complexidade, estrutura adequada) e 15% são lógica formal.</li>
+      <li><b>Python em todas as questões com código</b> desde 2025. O pseudocódigo não apareceu, mas o edital permite.</li>
+      <li><b>Os gabaritos são balanceados.</b> Nas provas 2025-2 e 2025-2R, cada letra (A–E) foi a resposta exatamente 4 vezes em 20. Em 30 questões, espere cerca de 6 por letra (veja <a href="#diaD">dia da prova</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section id="ranking">
+  <div class="eyebrow">Resultado da MRP</div>
+  <h2>Ranking de temas e questões esperadas em 2027</h2>
+  <div class="tablebox"><table>
+    <thead><tr><th>Bloco</th><th>Participação</th><th class="barcell">Peso</th><th>Esperado em 30</th></tr></thead>
+    <tbody>
+      <tr><td>Programação estruturada (Python)</td><td class="num">25,0%</td><td class="barcell"><div class="bar" style="width:100%"></div></td><td class="num">7–8</td></tr>
+      <tr><td>Lógica</td><td class="num">23,1%</td><td class="barcell"><div class="bar" style="width:92%"></div></td><td class="num">7</td></tr>
+      <tr><td>Estruturas de dados</td><td class="num">19,7%</td><td class="barcell"><div class="bar" style="width:79%"></div></td><td class="num">6</td></tr>
+      <tr><td>Ordenação e complexidade</td><td class="num">17,2%</td><td class="barcell"><div class="bar" style="width:69%"></div></td><td class="num">5</td></tr>
+      <tr><td>Busca (binária + grafos)</td><td class="num">15,0%</td><td class="barcell"><div class="bar" style="width:60%"></div></td><td class="num">4–5</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="tablebox"><table>
+    <thead><tr><th>Faixa</th><th>Subtema</th><th>Provas 2025</th><th>Esperado</th><th>P(≥1)</th><th>Onde estudar</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tier t-s">S</span></td><td>Teste de mesa Python (loops, listas, strings, <code>%</code> <code>//</code>)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">3,9</td><td class="num">99%</td><td>Summerfield cap. 1–2; provas</td></tr>
+      <tr><td><span class="tier t-s">S</span></td><td>Lógica: equivalências (condicional, contrapositiva, De Morgan, bicondicional)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">3,6</td><td class="num">98%</td><td>Gersting 1.1–1.2</td></tr>
+      <tr><td><span class="tier t-s">S</span></td><td>BFS / DFS em grafo (ordem de visita, identificar, O(V+E), matriz de adjacência)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">2,5</td><td class="num">93%</td><td>Cormen 22.1–22.3</td></tr>
+      <tr><td><span class="tier t-s">S</span></td><td>Código de ordenação (completar linha, estado após a k-ésima iteração)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">2,1</td><td class="num">88%</td><td>Cormen 2.1, 2.3, 7.1</td></tr>
+      <tr><td><span class="tier t-s">S</span></td><td>Pilha (balanceamento, pós-fixa, trace de classe Pilha)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">2,0</td><td class="num">87%</td><td>Cormen 10.1; Puga</td></tr>
+      <tr><td><span class="tier t-s">S</span></td><td>Busca binária (trace de comparações, pré-condição, O(log n))</td><td><span class="bubbles"><i class="on"></i><i></i><i class="on"></i></span></td><td class="num">2,0</td><td class="num">87%</td><td>Cormen ex. 2.3-5; provas</td></tr>
+      <tr><td><span class="tier t-a">A</span></td><td>Negação (de "todo", de "e", de condicional)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">1,5</td><td class="num">79%</td><td>Gersting 1.1, 1.3</td></tr>
+      <tr><td><span class="tier t-a">A</span></td><td>Recursão (ordem de impressão, slicing, lista aninhada)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">1,5</td><td class="num">79%</td><td>Summerfield cap. 4; Puga cap. 4</td></tr>
+      <tr><td><span class="tier t-a">A</span></td><td>Pegadinhas Python (<code>and/or</code>, <code>for-else</code>, precedência)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">1,5</td><td class="num">79%</td><td>Summerfield cap. 1–2</td></tr>
+      <tr><td><span class="tier t-a">A</span></td><td>Árvore binária de busca (inserção, percursos, folhas)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td class="num">1,5</td><td class="num">79%</td><td>Cormen 12.1–12.3</td></tr>
+      <tr><td><span class="tier t-a">A</span></td><td>Conceitos de ordenação (estável, comparação x contagem, dividir e conquistar)</td><td><span class="bubbles"><i class="on"></i><i></i><i class="on"></i></span></td><td class="num">1,6</td><td class="num">80%</td><td>Cormen 2.3, 8.1–8.2</td></tr>
+      <tr><td><span class="tier t-b">B</span></td><td>Complexidade dos sorts (melhor/médio/pior)</td><td><span class="bubbles"><i></i><i class="on"></i><i class="on"></i></span></td><td class="num">1,0</td><td class="num">65%</td><td>Cormen 3, 7.2</td></tr>
+      <tr><td><span class="tier t-b">B</span></td><td>Tabela hash (busca O(1), chaves únicas)</td><td><span class="bubbles"><i></i><i class="on"></i><i class="on"></i></span></td><td class="num">1,0</td><td class="num">65%</td><td>Cormen 11.1–11.2</td></tr>
+      <tr><td><span class="tier t-b">B</span></td><td>Heap / fila de prioridade (<code>heapq</code> com tuplas)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i></i></span></td><td class="num">0,9</td><td class="num">61%</td><td>Cormen 6.1, 6.5</td></tr>
+      <tr><td><span class="tier t-b">B</span></td><td>Argumentos válidos e silogismos</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i></i></span></td><td class="num">0,9</td><td class="num">61%</td><td>Gersting 1.2, 1.4</td></tr>
+      <tr><td><span class="tier t-b">B</span></td><td>Valor lógico a partir de premissas (tabela-verdade)</td><td><span class="bubbles"><i class="on"></i><i class="on"></i><i></i></span></td><td class="num">0,9</td><td class="num">61%</td><td>Gersting 1.1</td></tr>
+      <tr><td><span class="tier t-c">C</span></td><td>Matrizes (loops aninhados)</td><td><span class="bubbles"><i></i><i></i><i class="on"></i></span></td><td class="num">0,6</td><td class="num">44%</td><td>Puga cap. 2</td></tr>
+      <tr><td><span class="tier t-c">C</span></td><td>Fila / fila circular / deque</td><td><span class="bubbles"><i></i><i class="on"></i><i></i></span></td><td class="num">0,5</td><td class="num">38%</td><td>Cormen 10.1</td></tr>
+      <tr><td><span class="tier t-c">C</span></td><td>Complexidade de recursão (ex.: Fibonacci O(2ⁿ))</td><td><span class="bubbles"><i></i><i class="on"></i><i></i></span></td><td class="num">0,5</td><td class="num">38%</td><td>Cormen 3, 4.4</td></tr>
+      <tr><td><span class="tier t-c">C</span></td><td>Listas encadeadas (caiu em 2022 e 2024)</td><td><span class="bubbles"><i></i><i></i><i></i></span></td><td class="num">0,3</td><td class="num">~30%</td><td>Cormen 10.2</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Bolinhas = presença em 2025-1, 2025-2 e 2025-2R, nessa ordem. P(≥1) é a estimativa da chance de o subtema ter pelo menos uma questão numa prova de 30.</p>
+</section>
+
+<section id="prova2027">
+  <div class="eyebrow">Projeção</div>
+  <h2>A prova provável de 04/02/2027</h2>
+  <p>Se a banca mantiver a ordem fixa e a proporção de 2025, as questões 11 a 40 (as 1 a 10 são de Inglês) devem ficar assim:</p>
+  <div class="blueprint" aria-label="Distribuição projetada das questões 11 a 40">
+    <div class="bq prog">11</div><div class="bq prog">12</div><div class="bq prog">13</div><div class="bq prog">14</div><div class="bq prog">15</div><div class="bq prog">16</div><div class="bq prog">17</div><div class="bq prog">18</div>
+    <div class="bq ed">19</div><div class="bq ed">20</div><div class="bq ed">21</div><div class="bq ed">22</div><div class="bq ed">23</div><div class="bq ed">24</div>
+    <div class="bq busca">25</div><div class="bq busca">26</div><div class="bq busca">27</div><div class="bq busca">28</div>
+    <div class="bq ord">29</div><div class="bq ord">30</div><div class="bq ord">31</div><div class="bq ord">32</div><div class="bq ord">33</div>
+    <div class="bq log">34</div><div class="bq log">35</div><div class="bq log">36</div><div class="bq log">37</div><div class="bq log">38</div><div class="bq log">39</div><div class="bq log">40</div>
+  </div>
+  <div class="legend">
+    <span style="color:var(--pen)"><i style="background:var(--pen-soft)"></i>Python (8)</span>
+    <span style="color:var(--ok)"><i style="background:var(--ok-soft)"></i>Estruturas de dados (6)</span>
+    <span style="color:var(--warn)"><i style="background:var(--warn-soft)"></i>Busca (4)</span>
+    <span style="color:var(--hot)"><i style="background:var(--hot-soft)"></i>Ordenação/complexidade (5)</span>
+    <span><i></i>Lógica (7)</span>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>As 12 questões "carimbadas"</h3>
+      <ul class="trap">
+        <li>Saída de um loop com <code>%</code>, <code>//</code> e acumulador</li>
+        <li>Saída de uma função recursiva que imprime antes e depois da chamada</li>
+        <li>Expressão com <code>and</code>/<code>or</code> que devolve <code>True</code>/<code>False</code> ou um valor</li>
+        <li>Ordem de visita do BFS (com <code>deque</code>) e do DFS num dicionário de adjacência</li>
+        <li>"Qual estrutura é a mais adequada para…" (pilha para balanceamento, hash para O(1), heap para prioridade)</li>
+        <li>Trace de uma classe <code>Pilha</code> com push e pop</li>
+        <li>Inserção em BST (sequência que gera a árvore ou código recursivo para completar)</li>
+        <li>Sequência de comparações da busca binária</li>
+        <li>Lista após a k-ésima passada de selection, insertion ou bubble sort</li>
+        <li>Completar a linha do quicksort, do bubble ou do insertion</li>
+        <li>Tabela de complexidade melhor/médio/pior de merge, quick e bubble</li>
+        <li>Negação de condicional (<span class="mono">p ∧ ¬q</span>) e de "todo" ("algum não")</li>
+      </ul></div>
+    <div class="card"><h3>O que muda com 30 questões</h3>
+      <ul class="trap">
+        <li>Cerca de 10 questões novas. Na prova de 2022, que tinha 30 questões de específicas, a banca usou mais lógica (6), mais árvores (4) e mais código "o que a função faz".</li>
+        <li>Temas da faixa C (lista encadeada, fila circular, matriz, complexidade de recursão) ganham chance real de cair.</li>
+        <li>Pseudocódigo pode voltar (o edital permite e a prova de 2022 usou).</li>
+        <li>O tempo por questão importa mais. Treine para fazer as 40 questões em cerca de 2h30 e ter folga.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section id="cronograma">
+  <div class="eyebrow">13 semanas + reta final</div>
+  <h2>Cronograma com checkpoints</h2>
+  <p>Carga: <b>2h de segunda a sexta</b>, à noite (1h40 de Específicas + 20 min de Inglês), e <b>4h no sábado e no domingo</b> (3h + 1h de Inglês). São cerca de 18h por semana. Os simulados ficam nos fins de semana. A versão atualizada, dia a dia, está na <a href="https://claude.ai/artifact/5Yae2MictWDHGVAE9ABLSj" target="_blank" rel="noopener">agenda</a>. Os horários vermelhos são prazos do edital. Marque as tarefas conforme for fazendo; o progresso fica salvo neste navegador.</p>
+  <div class="progress"><span id="pct">0%</span><div class="track"><div class="fill" id="fill"></div></div><span id="cnt">0/0</span></div>
+  <div class="weeks" id="weeks"></div>
+</section>
+
+<section id="tecnicas">
+  <div class="eyebrow">Como estudar</div>
+  <h2>Técnicas aplicadas a esta prova</h2>
+  <div class="grid2">
+    <div class="card"><h3>Teste de mesa no papel</h3><p>A prova proíbe computador e calculadora. Para cada código, monte uma tabela com uma coluna por variável e uma linha por iteração. <b>Só depois</b> rode no Python para conferir. Se errou, anote no caderno de erros qual linha você leu errado.</p>
+<pre>i | total | ação
+1 |   1   | ímpar +=
+2 |  -1   | par  -=
+3 |   2   | ...</pre></div>
+    <div class="card"><h3>Recuperação ativa</h3><p>Feche o livro e escreva de memória o bubble, o insertion, a busca binária, o BFS e as 6 equivalências lógicas. Faça isso toda segunda-feira, a partir da semana em que o tema foi estudado. Só vale o que sai sem consulta.</p></div>
+    <div class="card"><h3>Repetição espaçada 1-3-7-14-30</h3><p>Revise cada tema 1, 3, 7, 14 e 30 dias depois do primeiro estudo. Use flashcards no Anki para fórmulas (equivalências, complexidades, pegadinhas Python) e refaça as questões erradas no calendário de revisão.</p></div>
+    <div class="card"><h3>Prática intercalada</h3><p>A partir da semana 8, nenhuma sessão é de tema único. Misture 3 de Python, 2 de estruturas de dados, 2 de ordenação e 3 de lógica, como na prova real. Intercalar treina reconhecer o tipo de questão, que é o que a prova cobra.</p></div>
+    <div class="card"><h3>Caderno de erros</h3><p>Para cada erro, anote: questão, tema, <b>tipo do erro</b> (conceito, leitura, cálculo ou pegadinha) e a regra que evitaria o erro. Na última semana você revisa só esse caderno. Ele vira o seu material mais valioso.</p></div>
+    <div class="card"><h3>Técnica de Feynman e gerador de questões</h3><p>Ao fim de cada tema, explique em voz alta em 2 minutos. Depois escreva 2 questões no estilo da banca (código + 5 alternativas, com pegadinhas). Criar distratores mostra se você entende onde está o erro.</p></div>
+  </div>
+</section>
+
+<section id="armadilhas">
+  <div class="eyebrow">Tiradas das provas</div>
+  <h2>Pegadinhas que a banca já usou</h2>
+  <div class="grid2">
+    <div class="card"><h3>Python</h3><ul class="trap">
+      <li><code>b &lt; a and a &gt; b or b &gt; a and a &lt; b</code>: o <code>and</code> tem precedência sobre o <code>or</code> e o resultado é <code>True</code> (2025-2, Q11)</li>
+      <li><code>for … else</code>: o <code>else</code> roda quando o loop termina <b>sem</b> <code>break</code> (2025-1, Q15)</li>
+      <li><code>for elem in v: elem *= 2</code> não altera a lista. <code>v[i] *= 3</code> altera, e <code>m = f(v)</code> é a mesma lista (2022, Q47)</li>
+      <li><code>lista[2:]</code> na recursão pula de 2 em 2 (2025-2R, Q13)</li>
+      <li><code>heapq</code> com tuplas desempata pelo 2º elemento: (1,'A') sai antes de (1,'D') (2025-1, Q20)</li>
+      <li><code>5 // 2 = 2</code> e <code>-7 // 2 = -4</code> (arredonda para baixo); <code>round(x % y, 2)</code></li>
+      <li><code>range(n-2)</code> e <code>range(1, n+1)</code>: confira sempre o primeiro e o último valor</li>
+      <li>Recursão: tudo que vem <b>depois</b> da chamada sai em ordem inversa (2025-2, Q13)</li>
+    </ul></div>
+    <div class="card"><h3>Estruturas, busca e ordenação</h3><ul class="trap">
+      <li>BFS com <code>deque.popleft()</code> visita por nível. DFS vai até o fim do primeiro vizinho antes do próximo</li>
+      <li>Busca binária: <code>mid = (l+r)//2</code>. Em 7 elementos, a 1ª comparação é com o índice 3</li>
+      <li>Selection sort "após a 2ª iteração": só as 2 primeiras posições estão fixas</li>
+      <li>Quicksort: no pior caso é O(n²); merge é O(n log n) em todos os casos, mas não é in-place</li>
+      <li>Counting sort não é por comparação; o limite inferior por comparação é Ω(n log n)</li>
+      <li>Estável = mantém a ordem relativa de elementos iguais</li>
+      <li>Fibonacci recursivo ingênuo = O(2ⁿ); BFS/DFS = O(V+E)</li>
+      <li>Número de BSTs com n nós distintos = número de Catalan (3 nós → 5)</li>
+    </ul></div>
+    <div class="card"><h3>Lógica</h3><ul class="trap">
+      <li>¬(p → q) ≡ <b>p ∧ ¬q</b> ("chove e o time joga")</li>
+      <li>p → q ≡ ¬q → ¬p (contrapositiva) ≡ ¬p ∨ q. A recíproca q → p <b>não</b> é equivalente</li>
+      <li>¬(todo A é B) ≡ algum A não é B. Não é "nenhum"</li>
+      <li>¬(p ∧ q) ≡ ¬p ∨ ¬q; ¬(p ∨ q) ≡ ¬p ∧ ¬q</li>
+      <li>(p ∧ q) → r ≡ p → (q → r) (exportação, 2025-1, Q30)</li>
+      <li>p ↔ q ≡ (p → q) ∧ (q → p); o "ou exclusivo" é a negação do ↔</li>
+      <li>Condicional falsa ⇒ antecedente V e consequente F. Comece sempre por ela</li>
+      <li>"No mínimo 10 de 15 aprovados", negado, vira "no mínimo 6 reprovados" (2022, Q26)</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="ingles">
+  <div class="eyebrow">Etapa 1 · N1</div>
+  <h2>Inglês: padrão das 4 últimas provas</h2>
+  <p>Em todas as provas desde 2024 foi <b>um único texto de divulgação sobre pesquisa universitária em IA</b> (nas 3 provas de 2025, todos sobre estudos do MIT: 2 publicados pelo MIT News e 1 pela TIME) com <b>10 perguntas em inglês na ordem do texto</b>: ideia principal, detalhe, vocabulário em contexto, tom, propósito e implicação. O texto costuma ser de 3 a 9 meses antes da prova.</p>
+  <ul>
+    <li>A partir da semana 3: <b>3 artigos por semana</b> do <a href="https://news.mit.edu/topic/artificial-intelligence2" target="_blank" rel="noopener">MIT News — Artificial Intelligence</a> publicados entre maio de 2026 e janeiro de 2027. A prova pode até usar um deles.</li>
+    <li>Ao ler, responda: qual é o objetivo do estudo, o que foi achado, qual a limitação e qual o próximo passo. São exatamente as perguntas que a banca faz.</li>
+    <li>Leia as perguntas <b>antes</b> do texto. Como elas seguem a ordem dos parágrafos, você localiza cada resposta (scanning).</li>
+    <li>A meta é 8/10. O mínimo para não ser eliminado é 5, mas cada ponto de Inglês entra direto na nota final.</li>
+  </ul>
+</section>
+
+<section id="curriculo">
+  <div class="eyebrow">Etapa 3 · N3</div>
+  <h2>Currículo: vale até 40 pontos</h2>
+  <div class="callout hot"><p><b>Cada ano completo de experiência profissional em computação vale 2 pontos, até 8.</b> Isso equivale a 4 questões de Específicas. A pós lato sensu na área vale 4 e projetos de pesquisa ou extensão valem 1 ponto por semestre. Com uma declaração de RH bem feita e documentos organizados, você garante pontos sem estudar nada. Deixe tudo pronto até 20/12, porque o envio é em 05/02, logo depois da prova.</p></div>
+  <ul>
+    <li>Peça a declaração do RH com <b>cargo, período (datas exatas) e descrição das atividades de computação</b>. Cargos genéricos sem descrição não pontuam.</li>
+    <li>Só conta ano completo (12 meses) e semestre completo (6 meses). Não há proporcional.</li>
+    <li>Dois PDFs: (1) a tabela do Anexo III preenchida com as páginas indicadas; (2) toda a documentação num único arquivo, com páginas numeradas.</li>
+    <li>Se uma linha ficar sem quantidade, total <b>ou</b> página, ela vale zero.</li>
+    <li>Artigos: confira o Qualis 2021-2024 em Computação no Sucupira. Cada título conta uma vez só.</li>
+  </ul>
+</section>
+
+<section id="diaD">
+  <div class="eyebrow">04/02/2027 · noite</div>
+  <h2>Tática no dia da prova</h2>
+  <div class="grid2">
+    <div class="card"><h3>Ordem de resolução</h3><ul class="trap">
+      <li>1º Inglês (cerca de 25 min): é eliminatório, então garanta logo.</li>
+      <li>2º Lógica, nas últimas questões (cerca de 25 min): é rápido e confiável.</li>
+      <li>3º Conceituais de estruturas, busca e ordenação (sem código).</li>
+      <li>4º Teste de mesa, do mais curto para o mais longo.</li>
+      <li>Reserve 20 min no fim para passar as respostas para o cartão.</li>
+    </ul></div>
+    <div class="card"><h3>Chute calibrado</h3><p>Nas duas últimas provas, cada letra foi a resposta exatamente 4 vezes em 20. Em 2025-1 a distribuição foi A6, B6, C5, D3, E0. Em 30 questões, a expectativa é de cerca de 6 por letra. Depois de responder tudo que sabe, conte as letras marcadas e, nas questões que for chutar, prefira a letra que apareceu menos. Use isso só para chute: nunca troque uma resposta que você calculou.</p></div>
+    <div class="card"><h3>Logística</h3><ul class="trap">
+      <li>Chegue 1h antes. Leve documento com foto e caneta azul-escura ou preta.</li>
+      <li>Celular desligado antes de entrar. Se tocar, você é eliminado.</li>
+      <li>Em 02/02 o local e o horário são divulgados: confira e planeje o trajeto até a Av. dos Sabiás, 330.</li>
+      <li>Em 05/02 de manhã, envie o currículo (já pronto) pelo formulário.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Material na pasta</div>
+  <h2>Como usar cada prova antiga</h2>
+  <div class="tablebox"><table>
+    <thead><tr><th>Prova</th><th>Use para</th><th>Questões aproveitáveis</th></tr></thead>
+    <tbody>
+      <tr><td>2025-2R (edital 119)</td><td>Simulado diagnóstico (semana 1)</td><td>Todas, Q1–30</td></tr>
+      <tr><td>2025-1 (edital 03)</td><td>Checkpoint 1 (semana 4)</td><td>Todas, Q1–30</td></tr>
+      <tr><td>2025-2 (edital 80)</td><td>Checkpoint 2 (semana 7)</td><td>Todas, Q1–30</td></tr>
+      <tr><td>2024-2 (edital 11)</td><td>Treino por tema</td><td>Inglês Q1–10; Específicas Q18–25 (ignore OO, redes, BPMN e UML)</td></tr>
+      <tr><td>2022 (edital 83/2021)</td><td>Treino por tema</td><td>Lógica Q21–26; Python Q29–31; busca/ordenação Q32–36; árvores Q38, 40, 41, 45; Python Q47. Os códigos em C (Q27, 28, 39, 42) servem como pseudocódigo</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Como só existem 60 questões no formato atual, os simulados das semanas 11 a 13 precisam de questões novas no estilo da banca. Posso gerar esse banco de simulados com base no ranking acima.</p>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var W=[
+    {n:1,d:"02/11 – 08/11",t:"Diagnóstico e inscrição",ms:true,
+     ed:"Inscrição abre em 03/11 (formulário). Isenção da taxa até 03/12.",
+     k:["Fazer a inscrição e salvar o comprovante","Simulado diagnóstico: prova 2025-2R completa (30 q) em 90 min, sem consulta, às 20h","Corrigir com o gabarito e classificar cada erro por tema da MRP","Montar o caderno de erros e o baralho do Anki","Lógica: conectivos e tabela-verdade (Gersting 1.1)","Pedir ao RH a declaração com cargo, datas e atividades"],
+     cp:"Registre sua nota-base (N1 e N2). Ela define onde colocar horas extras."},
+    {n:2,d:"09/11 – 15/11",t:"Lógica proposicional (faixa S)",
+     k:["Equivalências: condicional ≡ ¬p∨q, contrapositiva, De Morgan, bicondicional, exportação","Negação de ∧, ∨, → e ↔ (fazer uma tabela própria)","Valor lógico a partir de premissas: começar pela condicional falsa","Resolver todas as questões de lógica das 5 provas (cerca de 25)","Python: tipos, operadores % // ** e precedência (Summerfield cap. 1)"],
+     cp:"Checkpoint L1: 20 questões de lógica com pelo menos 85% de acerto, em até 2 min cada."},
+    {n:3,d:"16/11 – 22/11",t:"Python I: teste de mesa (faixa S)",
+     k:["Strings, listas, range, slicing, métodos (append, sort, remove, upper)","Loops aninhados e acumuladores: 5 teste de mesa por dia no papel","Pegadinhas: and/or retornando valor, for-else, while True + return","Lógica: quantificadores, negação de todo/algum (Gersting 1.3)","Inglês: 3 artigos MIT News AI com as 4 perguntas-guia"],
+     cp:"Fazer de novo as Q11–15 das três provas de 2025 sem errar nenhuma."},
+    {n:4,d:"23/11 – 29/11",t:"Python II: funções e recursão",ms:true,
+     k:["Funções, escopo, f(f(3)), parâmetros padrão","Mutabilidade e aliasing de listas (2022, Q47)","Recursão: desenhar a pilha de chamadas, print antes e depois","Matrizes com listas de listas (matriz identidade, transposta)","Lógica: argumentos válidos e silogismos (Gersting 1.2, 1.4)","Revisão espaçada: lógica (dia 14)"],
+     cp:"Checkpoint 1 (sábado 28/11): prova 2025-1 completa em 90 min. Meta: 16/20 em Específicas e 8/10 em Inglês."},
+    {n:5,d:"30/11 – 06/12",t:"Estruturas lineares: pilha, fila, deque",
+     ed:"Último dia para pedir isenção: 03/12.",
+     k:["Pilha: balanceamento de símbolos, expressão pós-fixa, pilha monotônica (2025-1, Q17)","Classe Pilha/Fila em Python com trace de push e pop","Fila circular com índices % tamanho (2025-2, Q17)","Lista encadeada: nó, próximo, percorrer, inserir (Cormen 10.2)","Recuperação ativa: escrever Pilha e Fila de memória"],
+     cp:"Escrever de memória as classes Pilha e FilaCircular e acertar 10/10 questões de identificar a estrutura."},
+    {n:6,d:"07/12 – 13/12",t:"Hash, heap, set e dict",ms:true,
+     ed:"PAGAR A TAXA (R$ 100) E ENVIAR O COMPROVANTE ATÉ 13/12.",
+     k:["Tabela hash: busca O(1) média, colisões (Cormen 11.1–11.2)","Heap e fila de prioridade, heapq com tuplas (Cormen 6.1, 6.5)","Tabela de complexidade das operações: list, dict, set, deque","'Qual estrutura é a mais adequada': resolver todas das provas","Revisão espaçada: Python I e II"],
+     cp:"Conferir que a inscrição está paga e com o comprovante enviado."},
+    {n:7,d:"14/12 – 20/12",t:"Árvores binárias de busca",ms:true,
+     ed:"Homologação das inscrições: 18/12. Fechar o dossiê do currículo até 20/12.",
+     k:["Inserção em BST: desenhar a árvore a partir de uma sequência e o caminho inverso","Percursos pré, em e pós-ordem (2024-2, Q24); contar folhas e altura","Código recursivo de inserir com root.left = inserir(...) (2025-2R, Q24)","Caminho válido de busca numa BST (2022, Q41); número de Catalan","Montar os 2 PDFs do Anexo III"],
+     cp:"Checkpoint 2 (sábado 19/12): prova 2025-2 completa. Meta: 17/20."},
+    {n:8,d:"21/12 – 27/12",t:"Semana leve (Natal): grafos e revisão",
+     k:["Grafos: lista de adjacência (dict) x matriz de adjacência (Cormen 22.1)","Revisão espaçada de tudo (S1–S7) só pelo caderno de erros","1 bloco misto de 20 questões intercaladas","Inglês: 3 artigos"],
+     cp:"Nenhum tema com acerto abaixo de 70% no caderno de erros."},
+    {n:9,d:"28/12 – 03/01",t:"Busca: BFS, DFS e binária (faixa S)",
+     k:["BFS com deque e visitados: traçar a ordem em 5 grafos diferentes (Cormen 22.2)","DFS recursivo e com pilha: diferença na ordem de visita (Cormen 22.3)","Complexidade O(V+E) e quando usar cada um","Busca binária: sequência de comparações, retorno -1, pré-condição de lista ordenada","Busca sequencial: melhor e pior caso, não exige ordenação"],
+     cp:"Acertar as 5 questões de grafos e as 6 de busca binária das provas sem errar."},
+    {n:10,d:"04/01 – 10/01",t:"Ordenação I: sorts quadráticos",
+     k:["Bubble, selection e insertion: estado da lista após cada passada","Completar a linha que falta (swap, while j >= 0 and ...)","Identificar o algoritmo pelo código (2022, Q34)","Estabilidade de cada algoritmo","Recuperação ativa: escrever os 3 de memória"],
+     cp:"Escrever os 3 sorts de memória e acertar 8/8 questões de 'lista após k iterações'."},
+    {n:11,d:"11/01 – 17/01",t:"Ordenação II e complexidade",ms:true,
+     k:["Merge sort: dividir e conquistar, O(n log n) sempre, memória extra (Cormen 2.3)","Quicksort: pivô, partição, list comprehension (2025-2R, Q26), pior caso O(n²) (Cormen 7)","Heapsort e counting sort; ordenação por comparação x não comparação (Cormen 8.1–8.2)","Notação O, Θ e Ω; complexidade de recursões simples (Cormen 3)","Revisão espaçada: estruturas de dados e árvores"],
+     cp:"Checkpoint 3: simulado de 30 questões no formato 2027. Meta: 22/30."},
+    {n:12,d:"18/01 – 24/01",t:"Simulados completos (40 q)",
+     k:["Segunda às 19h: simulado A (10 de Inglês + 30), com cronômetro de 2h30","Terça e quarta: corrigir e atualizar o caderno de erros","Quinta às 19h: simulado B (mesmo dia da semana e horário da prova)","Sábado: simulado C + Inglês","Ensaiar a ordem de resolução e o chute calibrado"],
+     cp:"Meta: N2 ≥ 24/30 em 2 de 3 simulados. Abaixo disso, a semana 13 vai para o subtema mais fraco."},
+    {n:13,d:"25/01 – 31/01",t:"Lapidação",
+     k:["Simulado final na quinta 28/01, às 19h","Revisar só o caderno de erros e os flashcards","Fazer de novo as 60 questões de 2025 só nas que errou alguma vez","Inglês: 1 artigo por dia, lido em 10 min","Conferir os 2 PDFs do currículo"],
+     cp:"Caderno de erros revisado; nenhum erro repetido no último simulado."},
+    {n:14,d:"01/02 – 05/02",t:"Reta final e prova",ms:true,
+     ed:"02/02: local e horário. 04/02: PROVA (noite). 05/02: envio do currículo.",
+     k:["Segunda e terça: revisão leve das tabelas (equivalências, complexidades, pegadinhas)","02/02: conferir o local e o horário e planejar o trajeto","Quarta 03/02: sem conteúdo novo; dormir cedo","Quinta 04/02: prova. Chegar 1h antes com documento e caneta","Sexta 05/02: enviar o currículo pelo formulário"],
+     cp:"Fazer a prova com calma, seguindo a tática ensaiada."}
+  ];
+  var KEY="ppcomp2027-checks", state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){state={}}
+  var root=document.getElementById("weeks"), total=0;
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+  W.forEach(function(w){
+    var el=document.createElement("article"); el.className="week"+(w.ms?" milestone":"");
+    var h='<header><span class="eyebrow">Semana '+w.n+'</span><h3>'+esc(w.t)+'</h3><span class="mono">'+w.d+'</span></header>';
+    if(w.ed) h+='<div class="edital">Edital: '+esc(w.ed)+'</div>';
+    h+='<ul class="tasks">';
+    w.k.forEach(function(t,i){var id="w"+w.n+"t"+i; total++;
+      h+='<li><label><input type="checkbox" id="'+id+'"'+(state[id]?' checked':'')+'><span>'+esc(t)+'</span></label></li>';});
+    h+='</ul><div class="cp"><b>Checkpoint:</b> '+esc(w.cp)+'</div>';
+    el.innerHTML=h; root.appendChild(el);
+  });
+  function upd(){var c=root.querySelectorAll("input:checked").length;var p=Math.round(100*c/total);
+    document.getElementById("pct").textContent=p+"%";document.getElementById("cnt").textContent=c+"/"+total;
+    document.getElementById("fill").style.width=p+"%";}
+  root.addEventListener("change",function(e){if(e.target.type!=="checkbox")return;state[e.target.id]=e.target.checked;
+    try{localStorage.setItem(KEY,JSON.stringify(state))}catch(err){} upd();});
+  upd();
+  var exam=new Date(2027,1,4,19,0,0), now=new Date(), days=Math.ceil((exam-now)/86400000);
+  document.getElementById("countdown").textContent = days>1 ? days+" dias" : (days===1?"1 dia":"Hoje");
+})();
+</script>

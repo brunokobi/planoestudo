@@ -1,0 +1,13 @@
+# Tudo fica fora por padrão; só entram o site, o plano e os geradores.
+# (Livros, provas, edital e PDFs têm direitos de terceiros: nunca versionar.)
+/*
+!/.gitignore
+!/README.md
+!/Dockerfile
+!/nginx.conf
+!/.dockerignore
+!/agenda/
+!/gen/
+!/plano-ppcomp-2027.html
+__pycache__/
+.env*
