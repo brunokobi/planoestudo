@@ -25,4 +25,6 @@ O `Dockerfile` serve `agenda/` com nginx na porta 80:
 docker build -t planoestudo . && docker run -p 8080:80 planoestudo
 ```
 
+Em produção roda atrás do Traefik (rede `coolify`) com `docker compose up -d --build`. Para atualizar o site publicado: `git pull && docker compose up -d --build` na pasta do repositório no servidor.
+
 Livros, provas e o edital ficam fora do repositório, pelo `.gitignore`.
