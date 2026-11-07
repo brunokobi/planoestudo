@@ -30,7 +30,7 @@ function nav(){
     '<button type="button" class="pomo-btn" id="pomo-btn" aria-expanded="false" aria-controls="pomo-panel">🍅 <span id="pomo-mini">Pomodoro</span></button>'+
     '<div class="pomo-panel" id="pomo-panel" hidden></div></div>'+
     '<nav class="maintabs" aria-label="Principal">'+
-    t("analise.html","Análise da prova","analise")+t(HOME,"Plano de estudo","home")+t("mapa.html","Mapa mental","mapa")+t(weekFile(td.wk),"Semanas","semana")+
+    t("analise.html","Análise da prova","analise")+t(HOME,"Plano de estudo","home")+t("mapa.html","Mapa mental","mapa")+t(weekFile(td.wk),"Semanas","semana")+t("quadro.html","Quadro","kanban")+
     t("simulados.html","Simulados","simulados")+t("ingles.html","Inglês","ingles")+t("temas.html","Temas","temas")+t("tecnicas.html","Técnicas","tecnicas")+
     '<a class="today" href="'+dayHref(td)+'">Hoje · '+td.dm+'</a></nav></div>';
 }
@@ -586,6 +586,101 @@ function bindProv(){
   });
 }
 
+
+/* ---------- Quadro (kanban) ligado às tarefas dos dias ---------- */
+var KBCOLS = [["todo","A fazer"],["doing","Fazendo"],["review","Revisar"],["done","Feito"]];
+var KBTYPE = {rev:"Revisão", con:"Conteúdo", pv:"Questões", esp:"Específicas", ing:"Inglês", mine:"Minha"};
+var KBCLS = {rev:"revisao", con:"estudo", pv:"pratica", esp:"pratica", ing:"admin", mine:"simulado"};
+function strip(h){ var d = document.createElement("div"); d.innerHTML = h; return d.textContent; }
+function dayTasks(d){
+  var out = [], tp = d.topic ? T[d.topic] : null;
+  if (d.kind === "livre" || d.kind === "prova") return out;
+  d.rev.forEach(function(r){ var t = T[r.topic]; out.push({k:"rev:"+d.id+":"+r.topic, type:"rev", text:"Revisar "+t.titulo+" (revisão de "+r.k+" dia"+(r.k>1?"s":"")+")"}); });
+  if (tp) {
+    out.push({k:"c:"+d.id+":ler", type:"con", text:"Leitura: "+tp.leitura});
+    out.push({k:"c:"+d.id+":cards", type:"con", text:"Flashcards no Anki: "+tp.titulo});
+    out.push({k:"c:"+d.id+":blurt", type:"con", text:"Blurting: "+tp.titulo});
+  }
+  if ((tp && tp.provas) || d.provas) out.push({k:"pv:"+d.id, type:"pv", text:"Questões reais: "+((tp && tp.provas) || d.provas)});
+  d.tasks.forEach(function(x, j){ out.push({k:"t:"+d.id+":"+j, type:"esp", text:x}); });
+  if (d.ing) out.push({k:"ing:"+d.id, type:"ing", text:d.ing});
+  out.forEach(function(c){ c.day = d; });
+  return out;
+}
+function kbCol(c){ if (c.mine) return c.col; return st[c.k] ? "done" : (st["kb:"+c.k] || "todo"); }
+function kbMove(c, col){
+  if (c.mine) { c.col = col; c.doneAt = col === "done" ? todayISO() : null; }
+  else { st[c.k] = col === "done"; if (col === "done" || col === "todo") delete st["kb:"+c.k]; else st["kb:"+c.k] = col; }
+  save();
+}
+function kbCards(wk, f){
+  var t = todayISO(), cards = [];
+  DAYS.forEach(function(d){
+    var late = d.wk < wk && d.id < t;
+    if (d.wk !== wk && !(late && f.late)) return;
+    dayTasks(d).forEach(function(c){ if (d.wk !== wk && st[c.k]) return; c.late = d.id < t && !st[c.k]; cards.push(c); });
+  });
+  (st.kbc || []).forEach(function(c){ if (c.wk === wk || (f.late && c.wk < wk && c.col !== "done")) { c.mine = true; c.type = "mine"; cards.push(c); } });
+  return cards.filter(function(c){ return f.type === "all" || c.type === f.type; });
+}
+function kbCard(c, i){
+  var col = kbCol(c), ci = KBCOLS.map(function(x){return x[0];}).indexOf(col);
+  return '<article class="kb-card'+(c.late && col !== "done" ? " late" : "")+'" draggable="true" data-i="'+i+'" title="'+esc(c.text)+'">'+
+    '<div class="kb-top"><span class="pill p-'+KBCLS[c.type]+'">'+KBTYPE[c.type]+'</span>'+(c.late && col !== "done" ? '<span class="kb-late">atrasada</span>' : '')+'</div>'+
+    '<p class="kb-text">'+esc(c.text)+'</p>'+
+    '<div class="kb-foot">'+(c.day ? '<a href="'+dayHref(c.day)+'">'+c.day.wd+' '+c.day.dm+' ›</a>' : '<span class="small muted">semana '+c.wk+'</span>')+
+    '<span class="kb-act">'+(c.mine ? '<button type="button" class="kb-b" data-kb="del" data-i="'+i+'" aria-label="Excluir tarefa">✕</button>' : '')+
+    '<button type="button" class="kb-b" data-kb="left" data-i="'+i+'" aria-label="Mover para a coluna anterior"'+(ci === 0 ? " disabled" : "")+'>‹</button>'+
+    '<button type="button" class="kb-b" data-kb="right" data-i="'+i+'" aria-label="Mover para a próxima coluna"'+(ci === 3 ? " disabled" : "")+'>›</button></span></div></article>';
+}
+function kanban(){
+  var td = todayDay(), wk = +(st["kb:wk"] || td.wk), f = {type: st["kb:type"] || "all", late: st["kb:late"] !== false};
+  if (!WEEKS[wk-1]) wk = td.wk;
+  var CARDS = [];
+  function board(){
+    CARDS = kbCards(wk, f);
+    var by = {}; KBCOLS.forEach(function(c){ by[c[0]] = []; });
+    CARDS.forEach(function(c, i){ by[kbCol(c)].push(kbCard(c, i)); });
+    var done = by.done.length, tot = CARDS.length;
+    return pbar(done, tot, "cartões") + '<div class="kb">'+KBCOLS.map(function(c){
+      var n = by[c[0]].length, warn = c[0] === "doing" && n > 3;
+      return '<section class="kb-col'+(warn?" warn":"")+'" data-col="'+c[0]+'" aria-label="'+c[1]+'"><header><h3>'+c[1]+'</h3><span class="kb-n">'+n+'</span></header>'+
+        (warn ? '<p class="small kb-wip">Mais de 3 em andamento. Termine uma antes de puxar outra.</p>' : '')+
+        '<div class="kb-list">'+(by[c[0]].join("") || '<p class="small muted kb-empty">Arraste um cartão para cá</p>')+'</div></section>';
+    }).join("")+'</div>';
+  }
+  var types = [["all","Todos"]].concat(Object.keys(KBTYPE).map(function(k){ return [k, KBTYPE[k]]; }));
+  var h = '<section><div class="eyebrow">Quadro de tarefas · estilo Trello</div><h1>Quadro</h1>'+
+    '<p class="muted">As tarefas de cada dia da semana viram cartões. Arraste entre as colunas (no celular, use ‹ e ›). Mover para <b>Feito</b> marca a tarefa no dia, e marcar no dia move o cartão.</p></section>'+
+    '<section class="kb-bar"><label class="small">Semana <select class="btn" id="kb-wk">'+WEEKS.map(function(w){ return '<option value="'+w.n+'"'+(w.n===wk?" selected":"")+'>Semana '+w.n+' · '+esc(w.range)+(w.n===td.wk?" (atual)":"")+'</option>'; }).join("")+'</select></label>'+
+    '<div class="kb-types" role="group" aria-label="Filtrar por tipo">'+types.map(function(t){ return '<button type="button" class="btn'+(f.type===t[0]?" here":"")+'" data-kbtype="'+t[0]+'" aria-pressed="'+(f.type===t[0])+'">'+t[1]+'</button>'; }).join("")+'</div>'+
+    '<label class="check small"><input type="checkbox" id="kb-late"'+(f.late?" checked":"")+'><span>Trazer pendências de semanas anteriores</span></label>'+
+    '<form class="kb-new" id="kb-new"><input type="text" id="kb-title" maxlength="140" placeholder="Nova tarefa sua (ex.: pagar a taxa)" aria-label="Nova tarefa"><button class="btn primary" type="submit">+ Adicionar</button></form></section>'+
+    '<div id="kb-board">'+board()+'</div>';
+  setTimeout(function(){
+    var root = document.getElementById("kb-board"), dragI = null;
+    function redraw(){ root.innerHTML = board(); }
+    root.addEventListener("click", function(e){
+      var b = e.target.closest && e.target.closest("[data-kb]"); if (!b) return;
+      var c = CARDS[+b.getAttribute("data-i")], a = b.getAttribute("data-kb"), ids = KBCOLS.map(function(x){return x[0];}), ci = ids.indexOf(kbCol(c));
+      if (a === "del") { st.kbc = (st.kbc || []).filter(function(x){ return x.id !== c.id; }); save(); }
+      else kbMove(c, ids[Math.max(0, Math.min(3, ci + (a === "right" ? 1 : -1)))]);
+      redraw();
+    });
+    root.addEventListener("dragstart", function(e){ var el = e.target.closest && e.target.closest(".kb-card"); if (!el) return; dragI = +el.getAttribute("data-i"); el.classList.add("dragging"); try { e.dataTransfer.setData("text/plain", String(dragI)); e.dataTransfer.effectAllowed = "move"; } catch(err) {} });
+    root.addEventListener("dragend", function(){ dragI = null; root.querySelectorAll(".dragging,.over").forEach(function(x){ x.classList.remove("dragging","over"); }); });
+    root.addEventListener("dragover", function(e){ var col = e.target.closest && e.target.closest(".kb-col"); if (!col || dragI === null) return; e.preventDefault(); root.querySelectorAll(".kb-col.over").forEach(function(x){ if (x !== col) x.classList.remove("over"); }); col.classList.add("over"); });
+    root.addEventListener("drop", function(e){ var col = e.target.closest && e.target.closest(".kb-col"); if (!col || dragI === null) return; e.preventDefault(); kbMove(CARDS[dragI], col.getAttribute("data-col")); dragI = null; redraw(); });
+    document.getElementById("kb-wk").addEventListener("change", function(e){ wk = +e.target.value; st["kb:wk"] = wk; save(); redraw(); });
+    document.getElementById("kb-late").addEventListener("change", function(e){ f.late = e.target.checked; st["kb:late"] = f.late; save(); redraw(); });
+    document.querySelector(".kb-types").addEventListener("click", function(e){ var b = e.target.closest("[data-kbtype]"); if (!b) return; f.type = b.getAttribute("data-kbtype"); st["kb:type"] = f.type; save();
+      document.querySelectorAll("[data-kbtype]").forEach(function(x){ var on = x === b; x.classList.toggle("here", on); x.setAttribute("aria-pressed", String(on)); }); redraw(); });
+    document.getElementById("kb-new").addEventListener("submit", function(e){ e.preventDefault(); var inp = document.getElementById("kb-title"), t = inp.value.trim(); if (!t) return;
+      (st.kbc = st.kbc || []).push({id: "m" + Date.now(), text: t, col: "todo", wk: wk}); save(); inp.value = ""; redraw(); });
+  }, 0);
+  return h;
+}
+
 /* ---------- Página: simulados ---------- */
 var SIMDATE = {A:"2027-01-16", B:"2027-01-17", C:"2027-01-23", D:"2027-01-24", E:"2027-01-30"};
 var SIMDAY = {}; Object.keys(SIMDATE).forEach(function(k){ SIMDAY[SIMDATE[k]] = k; });
@@ -691,7 +786,7 @@ function countUp(){
   }, {threshold: 0.4});
   els.forEach(function(el){ io.observe(el); });
 }
-var R = {home:home, mapa:mapa, semana:semana, temas:temas, tecnicas:tecnicas, ingles:ingles, analise:analise, simulados:simulados};
+var R = {home:home, mapa:mapa, kanban:kanban, semana:semana, temas:temas, tecnicas:tecnicas, ingles:ingles, analise:analise, simulados:simulados};
 app.innerHTML = (R[PAGE] || home)();
 bindQuiz();
 bindProv();
