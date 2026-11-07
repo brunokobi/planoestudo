@@ -15,7 +15,7 @@ body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sheet)}
 a{color:var(--pen)}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sheet);border-bottom:1px solid var(--line)}
-.top .in{max-width:1000px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.top .in{max-width:1280px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
 .brand{font:700 17px var(--f-display);color:var(--ink);text-decoration:none;margin-right:auto}
 .nav{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .btn{font:500 13px var(--f-body);color:var(--pen);background:var(--sheet);border:1px solid var(--line);border-radius:999px;padding:6px 12px;text-decoration:none;cursor:pointer}
@@ -23,10 +23,10 @@ a{color:var(--pen)}
 .btn.primary{background:var(--pen);color:var(--sheet);border-color:var(--pen)}
 .btn.here{border-color:var(--pen);background:var(--pen-soft)}
 select.btn{appearance:auto;padding-right:8px}
-.wrap{max-width:1000px;margin:0 auto;padding-block:28px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:34px}
+.wrap{max-width:1280px;margin:0 auto;padding-block:28px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:34px}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
 h1{font-size:clamp(28px,5vw,42px)} h2{font-size:24px} h3{font-size:17px;font-weight:600}
-p{margin:0;max-width:72ch}
+p{margin:0;max-width:92ch}
 section{display:grid;gap:14px;min-width:0}
 .eyebrow{font:500 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pen)}
 .muted{color:var(--muted)} .small{font-size:13px}
@@ -129,7 +129,7 @@ tr:last-child td{border-bottom:0}
 .vocab div{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px}
 .vocab b{font-family:var(--f-mono);font-weight:500}
 .reading{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:12px;font-size:15.5px;line-height:1.7}
-.reading p{max-width:70ch}
+.reading p{max-width:88ch}
 .opts{list-style:none;padding:0;display:grid;gap:4px}
 .opts label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;padding:4px 8px;border-radius:6px}
 .opts input{margin-top:5px}
@@ -138,7 +138,7 @@ tr:last-child td{border-bottom:0}
 @media (prefers-reduced-motion:no-preference){.fill{transition:width .3s}}
 /* ---- abas ---- */
 .top .in{padding-block:10px 0;align-items:flex-end}
-.brand{display:grid;line-height:1.1;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:12px;line-height:1.1;padding-bottom:10px}.brand>span{display:grid}
 .brand small{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .maintabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;max-width:100%}
 .maintabs::-webkit-scrollbar{display:none}
@@ -178,3 +178,16 @@ td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:n
 .legend.circ i{width:12px;height:12px;border-radius:50%;border:1.5px solid currentColor}
 .trap{font-size:14px}
 @media (max-width:520px){.blueprint{grid-template-columns:repeat(6,1fr)}}
+
+/* logo */
+.logo{width:52px;height:52px;flex:none;background:#fff;border-radius:10px;padding:3px;box-shadow:0 0 0 1px var(--line)}
+/* cards que saltam no hover */
+.fact,a.card,.grid2>.card,.facts>.card{transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s,border-color .2s}
+@media (hover:hover){
+  .fact:hover,a.card:hover,.grid2>.card:hover,.facts>.card:hover{transform:translateY(-5px);box-shadow:0 12px 28px -12px rgba(16,24,40,.28);border-color:var(--pen)}
+}
+@media (prefers-reduced-motion:reduce){
+  .fact,a.card,.grid2>.card,.facts>.card{transition:none}
+  .fact:hover,a.card:hover,.grid2>.card:hover,.facts>.card:hover{transform:none}
+}
+@media (min-width:1100px){body{font-size:16.5px}.reading{font-size:16.5px}}

@@ -2,6 +2,7 @@
 "use strict";
 var DATA = window.DATA, DAYS = DATA.days, T = DATA.topics, ARTS = DATA.arts, WEEKS = DATA.weeks;
 var PAGE = document.body.getAttribute("data-page") || "home";
+var BRAND = document.body.getAttribute("data-brand") === "ifes";
 var app = document.getElementById("app");
 var KEY = "ppcomp2027-agenda", st = {};
 try { st = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { st = {}; }
@@ -24,7 +25,7 @@ function pbar(done, tot, unit){ var p = tot ? Math.round(100*done/tot) : 0;
 function nav(){
   var td = todayDay();
   function t(href, label, page){ return '<a class="'+(PAGE===page?"here":"")+'" href="'+href+'"'+(PAGE===page?' aria-current="page"':'')+'>'+label+'</a>'; }
-  document.getElementById("top").innerHTML = '<div class="in"><a class="brand" href="'+HOME+'">Agenda PPComp 2027<small>Preparação pessoal · seleção Ifes Serra</small></a>'+
+  document.getElementById("top").innerHTML = '<div class="in"><a class="brand" href="'+HOME+'">'+(BRAND?'<img class="logo" src="ifes-logo.svg" alt="Logo do Ifes" width="52" height="52">':'')+'<span>Agenda PPComp 2027<small>'+(BRAND?'Projeto pessoal · sem vínculo com o Ifes':'Preparação pessoal · seleção Ifes Serra')+'</small></span></a>'+
     '<nav class="maintabs" aria-label="Principal">'+
     t("analise.html","Análise da prova","analise")+t(HOME,"Plano de estudo","home")+t("mapa.html","Mapa mental","mapa")+t(weekFile(td.wk),"Semanas","semana")+
     t("simulados.html","Simulados","simulados")+t("ingles.html","Inglês","ingles")+t("temas.html","Temas","temas")+t("tecnicas.html","Técnicas","tecnicas")+
@@ -541,10 +542,30 @@ function bindSim(){
 
 /* ---------- inicialização ---------- */
 nav();
+
+/* ---------- números que sobem ao aparecer na tela ---------- */
+function countUp(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var els = [].slice.call(document.querySelectorAll(".fact b, .bigstat"));
+  if (reduce || !("IntersectionObserver" in window)) return;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return; io.unobserve(en.target);
+      var el = en.target, txt = el.textContent, m = txt.match(/^(\D*)(\d+)(.*)$/);
+      if (!m || +m[2] === 0) return;
+      var pre = m[1], n = +m[2], post = m[3], t0 = null, dur = Math.min(1400, 500 + n * 8);
+      function step(ts){ if (!t0) t0 = ts; var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = pre + Math.round(n * e) + post; if (p < 1) requestAnimationFrame(step); }
+      el.textContent = pre + "0" + post; requestAnimationFrame(step);
+    });
+  }, {threshold: 0.4});
+  els.forEach(function(el){ io.observe(el); });
+}
 var R = {home:home, mapa:mapa, semana:semana, temas:temas, tecnicas:tecnicas, ingles:ingles, analise:analise, simulados:simulados};
 app.innerHTML = (R[PAGE] || home)();
 bindQuiz();
 bindProv();
+countUp();
 bindSim();
 app.addEventListener("change", function(e){
   var k = e.target.getAttribute && e.target.getAttribute("data-k"); if (!k) return;

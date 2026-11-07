@@ -43,9 +43,15 @@ for a in d["arts"]:
     r = _pt[a["url"]]; a["pri"] = r["tier"]; a["score"] = r["total"]; a["pos"] = r["pos"]
     if r["note"]: a["why"] = r["note"]
 open(OUT + "/data.js", "w").write("window.DATA=" + json.dumps(d, ensure_ascii=False).replace("</", "<\\/") + ";")
-shutil.copy(G + "/app.js", OUT + "/app.js"); shutil.copy(G + "/style.css", OUT + "/style.css")
+shutil.copy(G + "/app.js", OUT + "/app.js"); shutil.copy(G + "/style.css", OUT + "/style.css"); shutil.copy(G + "/ifes-logo.svg", OUT + "/ifes-logo.svg")
+# Variante sem a marca do Ifes (para o link do Claude): ARTIFACT_OUT=<pasta> python3 gen/build.py
+ART = os.environ.get("ARTIFACT_OUT")
+if ART:
+    os.makedirs(ART, exist_ok=True)
+    for f in ("data.js", "app.js", "style.css"): shutil.copy(OUT + "/" + f, ART + "/" + f)
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">'
 BODY = '<header class="top" id="top"></header>\n<main id="app" class="wrap"></main>\n<script src="data.js"></script>\n<script src="app.js"></script>'
+NEUTRAL_ICON = '<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%231f3a8a%27/%3E%3Ctext x=%2732%27 y=%2742%27 font-family=%27sans-serif%27 font-size=%2726%27 font-weight=%27700%27 text-anchor=%27middle%27 fill=%27white%27%3EPP%3C/text%3E%3C/svg%3E">'
 def page(fname, title, attrs):
     html = f'''<!doctype html>
 <html lang="pt-BR">
@@ -56,14 +62,16 @@ def page(fname, title, attrs):
 <meta name="claude:viewport-fit-sides" content="cover">
 {FONTS}
 <link rel="stylesheet" href="style.css">
+{{ICON}}
 <style>:root{{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}img{{max-width:100%}}[hidden]{{display:none!important}}</style>
 </head>
-<body {attrs}>
+<body {attrs}{{BRAND}}>
 {BODY}
 </body>
 </html>
 '''
-    open(OUT + "/" + fname, "w").write(html)
+    open(OUT + "/" + fname, "w").write(html.replace("{ICON}", '<link rel="icon" type="image/svg+xml" href="ifes-logo.svg">').replace("{BRAND}", ' data-brand="ifes"'))
+    if ART: open(ART + "/" + fname, "w").write(html.replace("{ICON}", NEUTRAL_ICON).replace("{BRAND}", ""))
 for w in weeks:
     page(f"semana-{w['n']:02d}.html", f"Semana {w['n']} · PPComp", f'data-page="semana" data-week="{w["n"]}"')
 page("analise.html", "Análise da prova · PPComp", 'data-page="analise"')
@@ -77,6 +85,7 @@ page("tecnicas.html", "Técnicas · PPComp", 'data-page="tecnicas"')
 # index = página principal (o publish envolve no esqueleto)
 open(INDEX, "w").write(f'''<title>Agenda PPComp 2027</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+{NEUTRAL_ICON}
 {FONTS}
 <link rel="stylesheet" href="style.css">
 {BODY}
