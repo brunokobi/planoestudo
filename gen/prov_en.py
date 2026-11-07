@@ -51,7 +51,21 @@ SCORES = {
     30: (22, 16, 12, 9, 9, "Reabilitação com robôs; curto (730 palavras)."),
     31: (10, 18, 14, 14, 8, "Ensaio sobre IA na universidade, sem estudo."),
     32: (12, 12, 15, 10, 9, "Perfil de pesquisador; sem estudo único."),
+    33: (25, 16, 15, 15, 7, "Estudo com números claros (92%, 5%) e autor citado; robôs com modelo de visão e linguagem, como 2025-1; publicado em 05/11, na janela ideal."),
+    34: (24, 8, 15, 14, 4, "Estudo de IA em química; tema distante das provas e vocabulário técnico."),
 }
+
+# Varreduras do MIT News · AI depois da lista inicial (até 30/10/2026)
+SCANS = [
+    ("07/11/2026", [
+        ("05/11", "Clearing up a robot’s fuzzy memory", "Entrou: 78 pontos, Alta, 5º lugar. Tem 10 questões prováveis."),
+        ("06/11", "How to predict the behavior of molecules from scant data", "Entrou: 65 pontos, Média."),
+        ("03/11", "Building connections across the research infrastructure", "Fora: cobertura de evento, sem estudo."),
+        ("02/11", "Powering up for a pivotal moment", "Fora: cobertura de conferência de energia."),
+        ("02/11", "Regina Barzilay and Jim Collins win Pritzker Prize", "Fora: notícia de prêmio, 480 palavras."),
+        ("30/10", "MIT affiliates named 2026 Schmidt Sciences AI2050 Fellows", "Fora: lista de bolsistas."),
+    ]),
+]
 
 def tier(total):
     return "Máxima" if total >= 80 else "Alta" if total >= 70 else "Média"
@@ -491,8 +505,79 @@ QUIZ = [
     "To let employers decide how AI should be used."],
    "§17", "\"...very bad for thinking if you use it as an answer machine, but can be great for learning if you use it as a tutor.\""),
  ]),
+ (33, "Artigo 33 · Robot fuzzy memory", [
+  ("Which problem does the new memory system address?",
+   "Robots may store incorrect descriptions of objects in memory and have no way to correct them.",
+   ["Robots run out of storage space for images.",
+    "Robots cannot move through long hallways.",
+    "Robot cameras are too expensive for most homes.",
+    "Robots forget the faces of the people they work with."],
+   "§1, §2 e §13", "O exemplo do desfibrilador rotulado como extintor e a fala de Zhang: \"With no way to correct itself, this wrong memory would persist\"."),
+  ("How does UQ-DAAAM quantify the robot's uncertainty about what it saw?",
+   "By comparing multiple descriptions of the same object seen from different viewpoints.",
+   ["By asking a human to label every object.",
+    "By taking a single high-resolution image of each object.",
+    "By searching the internet for pictures of similar objects.",
+    "By measuring how much battery the camera uses."],
+   "§4", "\"...compares multiple descriptions of the same object, seen from different viewpoints, to quantify the robot's uncertainty\"."),
+  ("How does Luca Carlone contrast physical AI with ChatGPT?",
+   "For robots, simply adding a disclaimer that they might be wrong is not enough.",
+   ["Robots never make mistakes, unlike ChatGPT.",
+    "ChatGPT is more dangerous than any robot.",
+    "Robots should use ChatGPT to check their memory.",
+    "Disclaimers are required by law for all robots."],
+   "§8", "\"...it is not enough to simply put a disclaimer cautioning that sometimes the robot might be wrong.\" O robô precisa saber o que não sabe."),
+  ("What was DAAAM, the researchers' prior work?",
+   "A robot memory system that uses a vision-language model to describe objects and stores the captions in a 3D map.",
+   ["A robotic arm designed to assemble machinery.",
+    "A fire safety system for industrial buildings.",
+    "A chatbot that answers questions about robots.",
+    "A camera that only works in well-lit rooms."],
+   "§11", "O UQ-DAAAM acrescenta a medida de incerteza ao DAAAM."),
+  ("According to the text, why might DAAAM describe objects incorrectly?",
+   "Objects may be seen only partially or from far away, or the images may be blurry or poorly lit.",
+   ["The vision-language model was never trained on household objects.",
+    "The robot moves too slowly to capture images.",
+    "There are too many people in the environment.",
+    "The robot's memory is always full."],
+   "§12", "As causas do erro estão no §12, junto com o exemplo da chaminé confundida com um esquilo."),
+  ("What happens when the combined uncertainty number exceeds a certain threshold?",
+   "The system refines the caption by using additional images of the object.",
+   ["The robot stops moving until a human helps it.",
+    "The object is deleted from the robot's memory.",
+    "The robot asks the user to describe the object.",
+    "The robot turns off its camera to save energy."],
+   "§18", "\"If that number exceeds a certain threshold, the uncertainty is too high, and UQ-DAAAM will refine the caption by using additional images.\""),
+  ("Why is the heuristic described in the text important?",
+   "It identifies the best frames to select without rerunning the VLM, dramatically reducing computation.",
+   ["It makes the robot's images sharper.",
+    "It allows the robot to move faster.",
+    "It removes the need for a language model.",
+    "It increases the cost of running the system."],
+   "§19 e §20", "Heuristic = regra simples. A prova matemática mostra que ela acha os melhores quadros sem rodar o VLM de novo."),
+  ("How does the LLM combine the captions into a single description?",
+   "It puts more weight on new captions and on those with less ambiguity.",
+   ["It gives the same weight to every caption.",
+    "It puts more weight on the oldest captions.",
+    "It keeps only the first caption it received.",
+    "It chooses one caption at random."],
+   "§23", "\"To boost accuracy, the LLM puts more weight on new captions and those with less ambiguity.\""),
+  ("What results did the refinement step achieve?",
+   "It resolved ambiguities for about 92 percent of the objects, requiring only two additional captions per object.",
+   ["It resolved all ambiguities, but needed ten additional captions per object.",
+    "It increased the accuracy of object descriptions by 92 percent.",
+    "It resolved ambiguities for only 5 percent of the objects.",
+    "It needed 92 additional captions to resolve two objects."],
+   "§24", "92% dos objetos com 2 legendas extras; a precisão das descrições subiu 5%. Pegadinha de números trocados."),
+  ("Which future direction is mentioned by the researchers?",
+   "Using UQ-DAAAM to identify areas of high uncertainty that the robot could revisit.",
+   ["Replacing vision-language models with human operators.",
+    "Commercializing the system through Amazon.",
+    "Removing cameras from mobile robots.",
+    "Using the system only in hospitals."],
+   "§28", "Próximos passos no §27 e §28. A Amazon aparece no §29 justamente para dizer que o trabalho NÃO tem ligação com ela."),
+ ]),
 ]
-
 # Posição da alternativa certa (0=a ... 4=e), 2 de cada letra por artigo, sem padrão óbvio.
 POS = [
     [2, 0, 4, 1, 3, 3, 0, 2, 4, 1],
@@ -501,6 +586,7 @@ POS = [
     [0, 4, 3, 2, 1, 2, 1, 0, 4, 3],
     [3, 1, 2, 4, 0, 4, 2, 3, 1, 0],
     [2, 4, 0, 3, 1, 1, 0, 3, 2, 4],
+    [1, 3, 4, 0, 2, 4, 0, 2, 3, 1],
 ]
 
 def build(arts_meta):
@@ -521,4 +607,4 @@ def build(arts_meta):
         assert sorted(x["ans"] for x in out) == [0,0,1,1,2,2,3,3,4,4], label
         a = arts_meta[idx]
         quizzes.append(dict(id="p%d" % idx, idx=idx, title=a[3], url=a[4], dt=a[2], total=sum(SCORES[idx][:5]), qs=out))
-    return dict(rubric=[list(r) for r in RUBRIC], rank=rank, quizzes=quizzes)
+    return dict(rubric=[list(r) for r in RUBRIC], rank=rank, quizzes=quizzes, scans=[[d, [list(x) for x in L]] for d, L in SCANS])

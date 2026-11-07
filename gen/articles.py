@@ -45,4 +45,7 @@ A = [
  (13,"Média","05/08","Personalized physical therapy: Stroke rehabilitation powered by AI",B+"personalized-physical-therapy-stroke-rehabilitation-powered-by-ai-0805","IA em reabilitação; texto acessível"),
  (13,"Média","08/10","3 Questions: What is the best path forward for AI in academia?",B+"3-questions-best-path-forward-for-ai-academia-1008","IA na educação; perguntas de opinião"),
  (13,"Média","28/10","Making machines that can listen",B+"making-machines-that-can-listen-paris-smaragdis-1028","Perfil de pesquisador em IA de áudio"),
+ # Varredura de 07/11/2026 (artigos novos, entram como extras da semana)
+ (3,"Alta","05/11","Clearing up a robot’s fuzzy memory",B+"clearing-up-robot-fuzzy-memory-1105","Estudo de robôs com modelo de visão e linguagem; publicado na janela ideal"),
+ (4,"Média","06/11","How to predict the behavior of molecules from scant data",B+"how-to-predict-molecule-behavior-with-scant-data-1106","Estudo de IA em química; vocabulário técnico"),
 ]

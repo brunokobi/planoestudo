@@ -150,6 +150,9 @@ for s in S:
                 rev[x].append(dict(topic=s["topic"], k=k))
 WD = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
 DUR = {"livre": "livre", "prova": "prova", "leve": "30–45 min"}
+import prov_en
+QUIZ_IDX = {q[0] for q in prov_en.QUIZ}
+EXTRA_DONE = set()
 out = []
 for s in S:
     w = s["date"].weekday()
@@ -163,7 +166,12 @@ for s in S:
             ing = ("Inglês (1h): " if w >= 5 else "Inglês (20 min): ") + ing
         elif not ing:
             if w >= 5:
-                ing = ("Inglês (1h): reler os 3 artigos da semana pelo seu resumo, escrever 3 questões no estilo da banca e passar o Anki de vocabulário" if wk >= 3
+                extra = [x for x in A if x[0] == wk][3:] if wk not in EXTRA_DONE else []
+                if extra: EXTRA_DONE.add(wk)
+                ing = (("Inglês (1h): ler o artigo extra da semana (" + extra[0][3] + ") em 15 min" +
+                        (", fazer as 10 questões prováveis dele na aba Prováveis + questões" if A.index(extra[0]) in QUIZ_IDX else ", respondendo goal / finding / limitation / next step") +
+                        " e reler os outros pelo seu resumo") if extra and wk >= 3 else
+                       "Inglês (1h): reler os artigos da semana pelo seu resumo, escrever 3 questões no estilo da banca e passar o Anki de vocabulário" if wk >= 3
                        else "Inglês (1h): estudar as abas Tipos de pergunta e Método da página de Inglês e passar 2 grupos da aba Vocabulário para o Anki")
             else:
                 if wk >= 3 and wk <= 13:

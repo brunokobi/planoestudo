@@ -12,3 +12,4 @@
 !/plano-ppcomp-2027.html
 __pycache__/
 .env*
+.playwright-mcp/

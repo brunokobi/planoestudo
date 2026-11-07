@@ -126,7 +126,7 @@ var MAP = {
   left: [
     {name:"Lógica · ~7 q", color:"--vio", leaves:[["L1","Conectivos e tabela-verdade"],["L2","Condicional e contrapositiva"],["L3","Negações (MANÉ)"],["L4","De Morgan, ↔, exportação"],["L5","Valor lógico por premissas"],["L6","Todo / algum / nenhum"],["L7","Argumentos e silogismos"]]},
     {name:"Python · ~8 q", color:"--pen", leaves:[["P1","Operadores e and/or"],["P2","Strings e fatiamento"],["P3","Listas e range"],["P4","Teste de mesa (loops)"],["P5","for-else, break"],["P6","Funções e escopo"],["P7","Mutabilidade"],["P8","Recursão I"],["P9","Recursão II"],["P10","Matrizes"]]},
-    {name:"Inglês · 10 q (mín. 5)", color:"--ok", leaves:[["@ingles.html","1 texto sobre pesquisa em IA"],["@ingles.html#tipos","Perguntas na ordem do texto"],["@ingles.html#artigos","33 artigos prováveis"]]}
+    {name:"Inglês · 10 q (mín. 5)", color:"--ok", leaves:[["@ingles.html","1 texto sobre pesquisa em IA"],["@ingles.html#tipos","Perguntas na ordem do texto"],["@ingles.html#artigos","'+ARTS.length+' artigos prováveis"]]}
   ],
   right: [
     {name:"Estruturas de dados · ~6 q", color:"--warn", leaves:[["E1","Pilha: operações"],["E2","Pilha: balanceamento, pós-fixa"],["E3","Fila, circular, deque"],["E4","Lista encadeada"],["E5","Hash, dict, set"],["E6","Heap / heapq"],["E7","BST: inserção e busca"],["E8","Percursos e altura"],["C2","Custo das operações"]]},
@@ -370,7 +370,7 @@ function ingles(){
   P.texto = '<section><div class="eyebrow">Texto de treino · escrito para este plano (não é uma notícia real)</div><h2>'+esc(tx.title)+'</h2><div class="reading">'+tx.paras.map(function(p,i){return '<p><span class="small muted">['+(i+1)+']</span> '+esc(p)+'</p>';}).join("")+'</div>'+
     '<div class="card" id="quiz">'+tx.qs.map(function(q,i){return '<div class="ex"><b>'+(i+1)+'. '+esc(q[0])+'</b><ul class="opts">'+q[1].map(function(o,j){return '<li><label data-q="'+i+'" data-o="'+j+'"><input type="radio" name="q'+i+'" value="'+j+'"> <span>'+"abcde"[j]+') '+esc(o)+'</span></label></li>';}).join("")+'</ul></div>';}).join("")+
     '<div class="nav"><button class="btn primary" type="button" id="corrigir">Corrigir</button><span id="nota" class="meta"></span></div></div></section>';
-  P.artigos = '<section><div class="eyebrow">Leitura semanal</div><h2>33 artigos prováveis</h2>'+
+  P.artigos = '<section><div class="eyebrow">Leitura semanal</div><h2>'+ARTS.length+' artigos prováveis</h2>'+
     '<p class="muted">Notícias de IA do MIT News de maio a outubro de 2026, com o perfil dos textos das provas. São 3 por semana, da semana 3 à 13. Leia cada uma em 20 min respondendo: <b>What was the goal? What did they find? What is the limitation? What comes next?</b> Depois escreva 3 perguntas de múltipla escolha como se fosse a banca e ponha 5 palavras no Anki.</p>'+
     pbar(done, ARTS.length, "lidos")+
     '<div class="card"><h3>Varredura de artigos novos</h3><p>O texto da prova pode sair até janeiro de 2027. Toda segunda-feira, abra <a href="https://news.mit.edu/topic/artificial-intelligence2" target="_blank" rel="noopener">MIT News · Artificial Intelligence</a>, e de vez em quando <a href="https://www.sciencedaily.com/news/computers_math/artificial_intelligence/" target="_blank" rel="noopener">ScienceDaily · AI</a> e <a href="https://time.com/tag/artificial-intelligence/" target="_blank" rel="noopener">TIME · AI</a>. Se aparecer um estudo sobre LLMs ou sobre o efeito da IA nas pessoas, leia na mesma semana como prioridade máxima.</p><ul class="tasks">';
@@ -413,6 +413,10 @@ function pqPanel(z){
     '<div class="card">'+z.qs.map(function(q,i){ return pqBlock(z, q, i); }).join("")+'</div>'+
     '<div class="nav"><button class="btn primary" type="button" data-pqgrade="'+z.id+'">Corrigir</button><button class="btn" type="button" data-pqreset="'+z.id+'">Limpar</button><span class="meta" id="pqres-'+z.id+'"></span></div>';
 }
+function scanHTML(P){
+  return (P.scans||[]).slice().reverse().map(function(sc){ return '<div class="card"><h3>Varredura de '+esc(sc[0])+'</h3><p class="small muted">Artigos novos no MIT News · AI desde a varredura anterior, avaliados com a mesma régua.</p><ul>'+
+    sc[1].map(function(x){ return '<li><b>'+esc(x[1])+'</b> <span class="small muted">('+esc(x[0])+')</span>: '+esc(x[2])+'</li>'; }).join("")+'</ul></div>'; }).join("");
+}
 function pqPos(z){ return DATA.prov.rank.filter(function(r){return r.url===z.url;})[0].pos; }
 function provHTML(){
   var P = DATA.prov; if (!P) return "";
@@ -423,10 +427,10 @@ function provHTML(){
     return '<tr><td><b>'+r.pos+'º</b></td><td><a href="'+esc(r.url)+'" target="_blank" rel="noopener">'+esc(r.title)+'</a><div class="small muted">'+esc(r.note)+'</div></td><td>'+esc(r.dt)+'</td>'+
       r.s.map(function(v){return '<td>'+v+'</td>';}).join("")+'<td><b>'+r.total+'</b></td><td><span class="pill p-'+cls+'">'+r.tier+'</span></td></tr>'; }).join("");
   var tbl = '<div class="tablebox"><table><thead><tr><th>#</th><th>Artigo</th><th>Data</th><th>Formato<br>/30</th><th>Tema<br>/30</th><th>Janela<br>/15</th><th>Tam.<br>/15</th><th>Acess.<br>/10</th><th>Total</th><th>Prioridade</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
-  var lead = '<section><div class="eyebrow">Pré-análise dos 33 artigos</div><h2>Os mais prováveis e as questões de cada um</h2>'+
-    '<p class="muted">Cada artigo recebeu nota de 0 a 100 numa régua tirada das provas de 2022 a 2025-2R. Para os 6 primeiros, há 10 questões no formato da banca: em inglês, 5 alternativas, na ordem do texto, terminando com implicação ou lição geral. Cada simulado tem 2 respostas de cada letra, como nas provas de 2025.</p>'+
+  var lead = '<section><div class="eyebrow">Pré-análise dos '+P.rank.length+' artigos</div><h2>Os mais prováveis e as questões de cada um</h2>'+
+    '<p class="muted">Cada artigo recebeu nota de 0 a 100 numa régua tirada das provas de 2022 a 2025-2R. Para os '+P.quizzes.length+' primeiros, há 10 questões no formato da banca: em inglês, 5 alternativas, na ordem do texto, terminando com implicação ou lição geral. Cada simulado tem 2 respostas de cada letra, como nas provas de 2025.</p>'+
     '<div class="facts">'+top.slice(0,4).map(function(r){ return '<div class="fact"><b>'+r.total+'</b><span>'+r.pos+'º · '+esc(r.title)+'</span></div>'; }).join("")+'</div></section>';
-  return lead + tabs("prov", [{key:"ranking", label:"Ranking dos 33", html:rub+tbl}].concat(P.quizzes.slice().sort(function(a,b){ return pqPos(a)-pqPos(b); }).map(function(z,k){
+  return lead + tabs("prov", [{key:"ranking", label:"Ranking dos "+P.rank.length, html:rub+tbl+scanHTML(P)}].concat(P.quizzes.slice().sort(function(a,b){ return pqPos(a)-pqPos(b); }).map(function(z,k){
     var r = st["pqres:"+z.id]; return {key:z.id, cls:r?"done":"", label:pqPos(z)+'º · '+esc(z.title.replace(/^Q&A:\s*/,'').split(/[:—]/)[0].slice(0,34))+'<small>'+(r?r.ok+'/10':z.total+' pts')+'</small>', html:pqPanel(z)}; })), "ranking");
 }
 function bindProv(){
