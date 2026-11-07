@@ -191,3 +191,20 @@ td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:n
   .fact:hover,a.card:hover,.grid2>.card:hover,.facts>.card:hover{transform:none}
 }
 @media (min-width:1100px){body{font-size:16.5px}.reading{font-size:16.5px}}
+
+/* relógio + Pomodoro */
+.top .in{position:relative}
+.maintabs{flex-basis:100%}
+.hdrtools{display:flex;align-items:center;gap:10px;padding-bottom:10px}
+.clock{font:500 15px var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink);padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--paper)}
+.pomo-btn{font:600 14px var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink);background:var(--sheet);border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:36px}
+.pomo-btn:hover,.pomo-btn:focus-visible{border-color:var(--pen);outline:none}
+.pomo-btn.on{background:var(--hot-soft);border-color:var(--hot);color:var(--hot)}
+.pomo-btn.on.brk{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.pomo-panel{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(100% - 4px);width:min(360px,calc(100vw - 32px));background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px -16px rgba(16,24,40,.35);padding:16px;display:grid;gap:12px;z-index:30}
+.pp-head{display:flex;justify-content:space-between;align-items:center}
+.pp-time{font:700 48px/1 var(--f-display);font-variant-numeric:tabular-nums;text-align:center;letter-spacing:.02em}
+.pp-alert{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pomo-panel select.btn{max-width:100%;margin-top:4px;display:block}
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;background:var(--ink);color:var(--sheet);padding:12px 18px;border-radius:12px;box-shadow:0 12px 30px -10px rgba(0,0,0,.4);max-width:calc(100vw - 32px);font-weight:500}
+@media (max-width:560px){.clock{font-size:13px;padding:4px 8px}.pomo-btn{font-size:13px;padding:4px 10px;min-height:32px}.hdrtools{padding-bottom:6px;gap:6px}}

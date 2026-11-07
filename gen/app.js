@@ -26,10 +26,114 @@ function nav(){
   var td = todayDay();
   function t(href, label, page){ return '<a class="'+(PAGE===page?"here":"")+'" href="'+href+'"'+(PAGE===page?' aria-current="page"':'')+'>'+label+'</a>'; }
   document.getElementById("top").innerHTML = '<div class="in"><a class="brand" href="'+HOME+'">'+(BRAND?'<img class="logo" src="ifes-logo.svg" alt="Logo do Ifes" width="52" height="52">':'')+'<span>Agenda PPComp 2027<small>'+(BRAND?'Projeto pessoal · sem vínculo com o Ifes':'Preparação pessoal · seleção Ifes Serra')+'</small></span></a>'+
+    '<div class="hdrtools"><span class="clock" id="clock" aria-label="Hora atual">--:--</span>'+
+    '<button type="button" class="pomo-btn" id="pomo-btn" aria-expanded="false" aria-controls="pomo-panel">🍅 <span id="pomo-mini">Pomodoro</span></button>'+
+    '<div class="pomo-panel" id="pomo-panel" hidden></div></div>'+
     '<nav class="maintabs" aria-label="Principal">'+
     t("analise.html","Análise da prova","analise")+t(HOME,"Plano de estudo","home")+t("mapa.html","Mapa mental","mapa")+t(weekFile(td.wk),"Semanas","semana")+
     t("simulados.html","Simulados","simulados")+t("ingles.html","Inglês","ingles")+t("temas.html","Temas","temas")+t("tecnicas.html","Técnicas","tecnicas")+
     '<a class="today" href="'+dayHref(td)+'">Hoje · '+td.dm+'</a></nav></div>';
+}
+
+/* ---------- relógio + Pomodoro (estado próprio, compartilhado entre páginas e abas) ---------- */
+var PK = "ppcomp2027-pomo";
+var POMO_MODES = {
+  classico: {label:"Clássico · 25 de foco / 5 de pausa", focus:25, short:5, long:15, every:4},
+  longo:    {label:"Longo · 50 de foco / 10 de pausa",   focus:50, short:10, long:20, every:2}
+};
+var PHASE_NAME = {focus:"Foco", short:"Pausa curta", long:"Pausa longa"};
+function pget(){ var p; try { p = JSON.parse(localStorage.getItem(PK) || "null"); } catch(e) {}
+  p = p || {}; if (!POMO_MODES[p.mode]) p.mode = "classico"; if (!PHASE_NAME[p.phase]) p.phase = "focus";
+  if (p.sound === undefined) p.sound = true; if (p.auto === undefined) p.auto = true; p.cycle = p.cycle || 0;
+  if (!p.running && !p.left) p.left = pmin(p) * 60000; return p; }
+function pset(p){ try { localStorage.setItem(PK, JSON.stringify(p)); } catch(e) {} }
+function pmin(p){ var m = POMO_MODES[p.mode]; return p.phase === "focus" ? m.focus : m[p.phase]; }
+function premain(p){ return p.running ? Math.max(0, p.end - Date.now()) : p.left; }
+function mmss(ms){ var s = Math.ceil(ms/1000); return pad(Math.floor(s/60)) + ":" + pad(s%60); }
+function ptoday(p){ var t = todayISO(); return p.day === t ? (p.done || 0) : 0; }
+var AC = null;
+function beep(){
+  try { AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.35, 0.7].forEach(function(t, i){ var o = AC.createOscillator(), g = AC.createGain();
+      o.type = "sine"; o.frequency.value = i === 2 ? 1046 : 784; o.connect(g); g.connect(AC.destination);
+      var t0 = AC.currentTime + t; g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.35, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.3); o.start(t0); o.stop(t0 + 0.32); });
+  } catch(e) {}
+}
+function toast(msg){
+  var el = document.getElementById("toast"); if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "alert"); document.body.appendChild(el); }
+  el.textContent = msg; el.hidden = false; clearTimeout(el._t); el._t = setTimeout(function(){ el.hidden = true; }, 12000);
+}
+var TITLE0 = document.title, flashT = null;
+function flashTitle(msg){ clearInterval(flashT); var n = 0;
+  flashT = setInterval(function(){ document.title = (n++ % 2) ? TITLE0 : "⏰ " + msg; if (n > 20) { clearInterval(flashT); document.title = TITLE0; } }, 1000); }
+function palert(next, p){
+  var msg = next === "focus" ? "Fim da pausa. Hora de voltar ao foco (" + pmin(p) + " min)." :
+            "Fim do foco! Pausa " + (next === "long" ? "longa" : "curta") + " de " + pmin(p) + " min. Levante, beba água, olhe para longe.";
+  if (p.sound) beep();
+  toast("🍅 " + msg); flashTitle(next === "focus" ? "Volte ao foco" : "Pausa!");
+  try { if ("Notification" in window && Notification.permission === "granted") new Notification("Pomodoro · PPComp 2027", {body: msg, tag: "ppcomp-pomo"}); } catch(e) {}
+}
+function pfinish(p){
+  var id = p.end; if (p.fired === id) return;
+  p.fired = id;
+  var next;
+  if (p.phase === "focus") { var t = todayISO(); if (p.day !== t) { p.day = t; p.done = 0; } p.done++; p.cycle++;
+    next = (p.cycle % POMO_MODES[p.mode].every === 0) ? "long" : "short"; }
+  else next = "focus";
+  p.phase = next;
+  if (p.auto) { p.running = true; p.end = Date.now() + pmin(p) * 60000; } else { p.running = false; p.left = pmin(p) * 60000; }
+  pset(p); palert(next, p);
+}
+function pomoPanel(p){
+  var m = POMO_MODES[p.mode], rem = premain(p), notif = !("Notification" in window) ? "indisponível" : Notification.permission;
+  return '<div class="pp-head"><span class="pill p-'+(p.phase==="focus"?"simulado":"admin")+'">'+PHASE_NAME[p.phase]+'</span><span class="small muted">ciclo '+((p.cycle % m.every) + 1)+' de '+m.every+'</span></div>'+
+    '<div class="pp-time" id="pp-time">'+mmss(rem)+'</div>'+
+    '<div class="nav"><button type="button" class="btn primary" data-pomo="toggle">'+(p.running?"Pausar":"Iniciar")+'</button>'+
+    '<button type="button" class="btn" data-pomo="skip">Pular fase</button><button type="button" class="btn" data-pomo="reset">Zerar</button></div>'+
+    '<label class="small">Modo <select class="btn" data-pomo="mode">'+Object.keys(POMO_MODES).map(function(k){ return '<option value="'+k+'"'+(k===p.mode?" selected":"")+'>'+POMO_MODES[k].label+'</option>'; }).join("")+'</select></label>'+
+    '<label class="check small"><input type="checkbox" data-pomo="sound"'+(p.sound?" checked":"")+'><span>Tocar som no fim de cada fase</span></label>'+
+    '<label class="check small"><input type="checkbox" data-pomo="auto"'+(p.auto?" checked":"")+'><span>Começar a próxima fase sozinho</span></label>'+
+    '<div class="pp-alert">'+(notif==="granted"?'<span class="small">✅ Notificações do navegador ativadas</span>':
+      notif==="denied"?'<span class="small muted">Notificações bloqueadas. Libere nas permissões do site (cadeado na barra de endereço). O som e o aviso na tela continuam.</span>':
+      notif==="indisponível"?'<span class="small muted">Este navegador ou página não permite notificações. O som e o aviso na tela continuam.</span>':
+      '<button type="button" class="btn" data-pomo="notify">🔔 Ativar alertas do navegador</button>')+
+    ' <button type="button" class="btn" data-pomo="test">Testar alerta</button></div>'+
+    '<p class="small muted">Hoje: <b>'+ptoday(p)+'</b> pomodoro'+(ptoday(p)===1?"":"s")+' de foco. Na rotina de 2h, 4 pomodoros de 25 min cobrem a 1h40 de Específicas; os 20 min de Inglês vêm depois. A cada '+m.every+' focos, pausa longa de '+m.long+' min.</p>';
+}
+function pomoInit(){
+  var btn = document.getElementById("pomo-btn"), panel = document.getElementById("pomo-panel"), clock = document.getElementById("clock");
+  if (!btn) return;
+  function render(){ panel.innerHTML = pomoPanel(pget()); }
+  function tick(){
+    var now = new Date(); clock.textContent = pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+    var p = pget(); if (p.running && Date.now() >= p.end) { pfinish(p); p = pget(); if (!panel.hidden) render(); }
+    var rem = premain(p), mini = document.getElementById("pomo-mini");
+    mini.textContent = (p.running || rem < pmin(p) * 60000) ? (p.phase === "focus" ? "" : "☕ ") + mmss(rem) + (p.running ? "" : " ⏸") : "Pomodoro";
+    btn.classList.toggle("on", !!p.running); btn.classList.toggle("brk", p.phase !== "focus");
+    var pt = document.getElementById("pp-time"); if (pt) pt.textContent = mmss(rem);
+  }
+  btn.addEventListener("click", function(){ var open = panel.hidden; panel.hidden = !open; btn.setAttribute("aria-expanded", String(open)); if (open) render(); });
+  document.addEventListener("click", function(e){ if (!panel.hidden && !panel.contains(e.target) && !btn.contains(e.target)) { panel.hidden = true; btn.setAttribute("aria-expanded","false"); } });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && !panel.hidden) { panel.hidden = true; btn.setAttribute("aria-expanded","false"); btn.focus(); } });
+  panel.addEventListener("click", function(e){
+    var a = e.target.getAttribute && e.target.getAttribute("data-pomo"); if (!a || a === "mode" || a === "sound" || a === "auto") return;
+    var p = pget();
+    if (a === "toggle") { if (p.running) { p.left = premain(p); p.running = false; } else { p.running = true; p.end = Date.now() + (p.left || pmin(p) * 60000); try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume(); } catch(err) {} } }
+    else if (a === "skip") { p.running = true; p.end = Date.now(); pset(p); pfinish(pget()); render(); tick(); return; }
+    else if (a === "reset") { p.phase = "focus"; p.cycle = 0; p.running = false; p.left = pmin(p) * 60000; }
+    else if (a === "notify") { try { Notification.requestPermission().then(function(){ render(); }); } catch(err) {} return; }
+    else if (a === "test") { palert(p.phase === "focus" ? "short" : "focus", p); return; }
+    pset(p); render(); tick();
+  });
+  panel.addEventListener("change", function(e){
+    var a = e.target.getAttribute("data-pomo"), p = pget();
+    if (a === "mode") { p.mode = e.target.value; p.phase = "focus"; p.cycle = 0; p.running = false; p.left = pmin(p) * 60000; }
+    else if (a === "sound" || a === "auto") p[a] = e.target.checked; else return;
+    pset(p); render(); tick();
+  });
+  window.addEventListener("storage", function(e){ if (e.key === PK && !panel.hidden) render(); });
+  tick(); setInterval(tick, 1000);
 }
 /* ---------- abas genéricas ---------- */
 var TABGROUPS = {};
@@ -266,6 +370,30 @@ function temas(){
 }
 
 /* ---------- Página: técnicas ---------- */
+
+/* ---------- baralho do Anki ---------- */
+var SITE = "https://planoestudo.brunokobi.tech";
+function ankiHTML(){
+  var dl = BRAND ? '<a class="btn primary" href="ppcomp-2027.apkg" download>⬇ Baixar o baralho (ppcomp-2027.apkg)</a>'
+                 : '<a class="btn primary" href="'+SITE+'/ppcomp-2027.apkg" target="_blank" rel="noopener">⬇ Baixar o baralho no site do plano</a>';
+  return '<div class="card"><h3>Baralho pronto: 337 cartões</h3>'+
+    '<div class="facts"><div class="fact"><b>66</b><span>palavras de Inglês (pesquisa, IA, conectores, falsos cognatos)</span></div><div class="fact"><b>49</b><span>palavras dos 7 artigos prováveis, com a frase do texto</span></div><div class="fact"><b>185</b><span>exercícios dos 31 temas, com resposta e explicação</span></div><div class="fact"><b>37</b><span>ganchos de memória</span></div></div>'+
+    '<div class="nav">'+dl+'</div></div>'+
+    '<div class="grid2"><div class="card"><h3>1. Importar (uma vez)</h3><ol>'+
+      '<li>Instale o Anki no computador: <a href="https://apps.ankiweb.net" target="_blank" rel="noopener">apps.ankiweb.net</a>.</li>'+
+      '<li>No Anki, clique em <b>Sincronizar</b> e entre com a sua conta do AnkiWeb.</li>'+
+      '<li>Dê dois cliques no arquivo baixado, ou use <b>Arquivo → Importar</b>.</li>'+
+      '<li>Clique em <b>Sincronizar</b> de novo. O baralho aparece em <a href="https://ankiweb.net/decks" target="_blank" rel="noopener">ankiweb.net/decks</a> e no celular (AnkiDroid ou AnkiMobile).</li></ol>'+
+      '<p class="small muted">O site do AnkiWeb não importa arquivos: a importação é pelo Anki do computador, ou direto pelo AnkiDroid no Android. Depois disso, tudo sincroniza.</p></div>'+
+    '<div class="card"><h3>2. Configurar (Opções do baralho "PPComp 2027")</h3><ul>'+
+      '<li><b>Novos cartões por dia: 20</b>. Em 17 dias você vê os 337, e sobram 2 meses e meio de revisão.</li>'+
+      '<li><b>Máximo de revisões por dia: 200</b>.</li>'+
+      '<li><b>FSRS: ligado</b>, com <b>retenção desejada 0,90</b> (em Opções → Avançado).</li>'+
+      '<li><b>Ordem dos novos: aleatória</b>, para misturar os temas como na prova.</li>'+
+      '<li>Faça o Anki nos 10 primeiros minutos da rotina (o aquecimento) e no Inglês de segunda-feira.</li></ul>'+
+      '<p class="small muted">Quando o plano ganhar cartões novos, baixe e importe o arquivo de novo: os cartões que você já tem são atualizados sem duplicar e o seu progresso continua.</p></div></div>'+
+    '<div class="card"><h3>3. Seus próprios cartões</h3><p>Ao ler cada artigo, crie 5 cartões no baralho <b>PPComp 2027::1 Inglês::2 Artigos prováveis</b>: na frente, a palavra e a frase do texto; no verso, o significado. Para código, use "código → saída". Um fato por cartão.</p></div>';
+}
 function tecnicas(){
   var C = [
     ["Recuperação ativa (efeito de teste)","Lembrar é o que fixa, reler não. Todo dia termina com 5 min de blurting: numa folha em branco, escreva tudo o que lembra do tema. Depois confira e complete com outra cor.","Último bloco de todo dia de conteúdo"],
@@ -283,6 +411,7 @@ function tecnicas(){
   ];
   return '<section><div class="eyebrow">Memorização</div><h1>Técnicas avançadas, já embutidas na agenda</h1><p class="muted">Você não precisa decidir quando usar cada técnica: cada dia já traz a sequência pronta. Aqui está o porquê de cada uma.</p></section>'+
     tabs("tecnicas", [{key:"lista", label:"As 12 técnicas", html:'<div class="grid2">'+C.map(function(c){return '<div class="card"><h3>'+esc(c[0])+'</h3><p>'+esc(c[1])+'</p><p class="small muted">Onde aparece: '+esc(c[2])+'</p></div>';}).join("")+'</div>'},
+      {key:"anki", label:"Anki", html:ankiHTML()},
       {key:"roteiro", label:"Roteiro do dia", html:'<div class="eyebrow">Dia de semana com conteúdo novo (2h)</div>'+timeline({kind:"estudo",wd:"Seg"})+'<div class="eyebrow">Sábado ou domingo com conteúdo novo (4h)</div>'+timeline({kind:"estudo",wd:"Sáb"})+'<div class="eyebrow">Dias de prática e revisão</div>'+timeline({kind:"pratica",wd:"Seg"})+timeline({kind:"pratica",wd:"Sáb"})}]);
 }
 
@@ -363,7 +492,7 @@ function ingles(){
     '<div><b>8–20</b>Responda em ordem; cada pergunta fica num parágrafo, então ache a palavra-chave nele (scanning)</div>'+
     '<div><b>20–23</b>Nas dúvidas, elimine alternativas extremas (always, never, all) e as que falam de algo fora do texto</div>'+
     '<div><b>23–25</b>Passe as respostas para o cartão</div></div></section>';
-  P.vocab = '<section><div class="eyebrow">Vocabulário essencial</div><h2>Palavras que aparecem nesses textos</h2><p class="muted small">Passe tudo para o Anki. Marque o grupo quando souber todas as palavras sem olhar.</p>'+
+  P.vocab = '<section><div class="eyebrow">Vocabulário essencial</div><h2>Palavras que aparecem nesses textos</h2><p><a class="btn" href="tecnicas.html#anki">Estas palavras já estão no baralho do Anki →</a></p><p class="muted small">Passe tudo para o Anki. Marque o grupo quando souber todas as palavras sem olhar.</p>'+
     EN.vocab.map(function(g,i){return '<div class="card"><h3>'+esc(g[0])+'</h3><div class="vocab">'+g[1].map(function(p){return '<div><b>'+esc(p[0])+'</b> — '+esc(p[1])+'</div>';}).join("")+'</div>'+chk("voc:"+i,"Domino este grupo")+'</div>';}).join("")+'</section>';
   P.treino = '<section><div class="eyebrow">Treino com provas</div><h2>Cronograma de treino com provas antigas</h2><ul class="tasks">'+
     EN.treino.map(function(t){return '<li>'+chk(t[0], '<b>'+t[1]+'</b> · '+esc(t[2]))+'</li>';}).join("")+'</ul><p class="small muted">Os PDFs estão em MESTRADO/provas. Cronometre 25 min por texto.</p></section>';
@@ -542,6 +671,7 @@ function bindSim(){
 
 /* ---------- inicialização ---------- */
 nav();
+pomoInit();
 
 /* ---------- números que sobem ao aparecer na tela ---------- */
 function countUp(){

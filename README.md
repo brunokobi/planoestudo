@@ -28,3 +28,11 @@ docker build -t planoestudo . && docker run -p 8080:80 planoestudo
 Em produção roda atrás do Traefik (rede `coolify`) com `docker compose up -d --build`. Para atualizar o site publicado: `git pull && docker compose up -d --build` na pasta do repositório no servidor.
 
 Livros, provas e o edital ficam fora do repositório, pelo `.gitignore`.
+
+## Baralho do Anki
+
+`agenda/ppcomp-2027.apkg` é gerado a partir do mesmo conteúdo do site (precisa do pacote `genanki`):
+
+```bash
+python3 gen/anki.py
+```
